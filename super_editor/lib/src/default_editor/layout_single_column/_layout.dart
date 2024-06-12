@@ -1,8 +1,9 @@
 import 'dart:math';
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:super_editor/src/core/document.dart';
 import 'package:super_editor/src/core/document_layout.dart';
@@ -1150,5 +1151,62 @@ class _ComponentState extends State<_Component> {
       ),
       child: component,
     );
+  }
+}
+
+/// Makes its child draggable starting from long press.
+///
+/// See also:
+///
+///  * [Draggable], similar to the [LongPressDraggable] widget but happens immediately.
+///  * [DragTarget], a widget that receives data when a [Draggable] widget is dropped.
+class LongPressDraggable<T extends Object> extends Draggable<T> {
+  /// Creates a widget that can be dragged starting from long press.
+  ///
+  /// If [maxSimultaneousDrags] is non-null, it must be non-negative.
+  const LongPressDraggable({
+    super.key,
+    required super.child,
+    required super.feedback,
+    super.data,
+    super.axis,
+    super.childWhenDragging,
+    super.feedbackOffset,
+    super.dragAnchorStrategy,
+    super.maxSimultaneousDrags,
+    super.onDragStarted,
+    super.onDragUpdate,
+    super.onDraggableCanceled,
+    super.onDragEnd,
+    super.onDragCompleted,
+    this.hapticFeedbackOnStart = true,
+    super.ignoringFeedbackSemantics,
+    super.ignoringFeedbackPointer,
+    this.delay = kLongPressTimeout,
+    super.allowedButtonsFilter,
+    super.hitTestBehavior,
+    super.rootOverlay,
+  });
+
+  /// Whether haptic feedback should be triggered on drag start.
+  final bool hapticFeedbackOnStart;
+
+  /// The duration that a user has to press down before a long press is registered.
+  ///
+  /// Defaults to [kLongPressTimeout].
+  final Duration delay;
+
+  @override
+  DelayedMultiDragGestureRecognizer createRecognizer(
+      GestureMultiDragStartCallback onStart) {
+    return DelayedMultiDragGestureRecognizer(
+        delay: delay, allowedButtonsFilter: allowedButtonsFilter)
+      ..onStart = (Offset position) {
+        final Drag? result = onStart(position);
+        if (result != null && hapticFeedbackOnStart) {
+          HapticFeedback.selectionClick();
+        }
+        return result;
+      };
   }
 }
