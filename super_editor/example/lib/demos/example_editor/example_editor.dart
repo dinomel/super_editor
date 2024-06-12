@@ -1,6 +1,10 @@
+import 'dart:developer';
+
+import 'package:super_editor/src/default_editor/example_editor_notifier.dart';
 import 'package:example/logging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:super_editor/super_editor.dart';
 import 'package:super_editor_markdown/super_editor_markdown.dart';
 
@@ -20,15 +24,12 @@ class _ExampleEditorState extends State<ExampleEditor> {
   final GlobalKey _viewportKey = GlobalKey();
   final GlobalKey _docLayoutKey = GlobalKey();
 
-  late MutableDocument _doc;
   final _docChangeSignal = SignalNotifier();
   late MutableDocumentComposer _composer;
   late Editor _docEditor;
   late CommonEditorOperations _docOps;
 
   late FocusNode _editorFocusNode;
-
-  late ScrollController _scrollController;
 
   final SelectionLayerLinks _selectionLayerLinks = SelectionLayerLinks();
 
@@ -53,26 +54,41 @@ class _ExampleEditorState extends State<ExampleEditor> {
   @override
   void initState() {
     super.initState();
-    _doc = createInitialDocument()..addListener(_onDocumentChange);
+    final notifier = context.read<ExampleEditorNotifier>();
+    final doc = notifier.doc;
+    doc.addListener(_onDocumentChange);
     _composer = MutableDocumentComposer();
     _composer.selectionNotifier.addListener(_hideOrShowToolbar);
-    _docEditor = createDefaultDocumentEditor(document: _doc, composer: _composer);
+    _docEditor =
+        createDefaultDocumentEditor(document: doc, composer: _composer);
     _docOps = CommonEditorOperations(
       editor: _docEditor,
-      document: _doc,
+      document: doc,
       composer: _composer,
-      documentLayoutResolver: () => _docLayoutKey.currentState as DocumentLayout,
+      documentLayoutResolver: () =>
+          _docLayoutKey.currentState as DocumentLayout,
     );
     _editorFocusNode = FocusNode();
-    _scrollController = ScrollController()..addListener(_hideOrShowToolbar);
+
+    notifier.scrollController.addListener(_hideOrShowToolbar);
 
     _iosControlsController = SuperEditorIosControlsController();
+
+    // WidgetsBinding.instance.addPostFrameCallback((_) {
+    //   for (final node in _doc.nodes) {
+    //     RenderBox box = GlobalObjectKey(node.id)
+    //         .currentContext!
+    //         .findRenderObject() as RenderBox;
+    //     Offset position = box.localToGlobal(Offset.zero);
+    //     double y = position.dy;
+    //     log('y position for node ${node.id} is $y');
+    //   }
+    // });
   }
 
   @override
   void dispose() {
     _iosControlsController.dispose();
-    _scrollController.dispose();
     _editorFocusNode.dispose();
     _composer.dispose();
     super.dispose();
@@ -84,6 +100,9 @@ class _ExampleEditorState extends State<ExampleEditor> {
   }
 
   void _hideOrShowToolbar() {
+    final notifier = context.read<ExampleEditorNotifier>();
+    final doc = notifier.doc;
+
     if (_gestureMode != DocumentGestureMode.mouse) {
       // We only add our own toolbar when using mouse. On mobile, a bar
       // is rendered for us.
@@ -115,7 +134,7 @@ class _ExampleEditorState extends State<ExampleEditor> {
       return;
     }
 
-    final selectedNode = _doc.getNodeById(selection.extent.nodeId);
+    final selectedNode = doc.getNodeById(selection.extent.nodeId);
 
     if (selectedNode is ImageNode) {
       appLog.fine("Showing image toolbar");
@@ -150,8 +169,10 @@ class _ExampleEditorState extends State<ExampleEditor> {
     // TODO: switch this to use a Leader and Follower
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       final docBoundingBox = (_docLayoutKey.currentState as DocumentLayout)
-          .getRectForSelection(_composer.selection!.base, _composer.selection!.extent)!;
-      final docBox = _docLayoutKey.currentContext!.findRenderObject() as RenderBox;
+          .getRectForSelection(
+              _composer.selection!.base, _composer.selection!.extent)!;
+      final docBox =
+          _docLayoutKey.currentContext!.findRenderObject() as RenderBox;
       final overlayBoundingBox = Rect.fromPoints(
         docBox.localToGlobal(docBoundingBox.topLeft),
         docBox.localToGlobal(docBoundingBox.bottomRight),
@@ -234,8 +255,10 @@ class _ExampleEditorState extends State<ExampleEditor> {
     // TODO: switch to a Leader and Follower for this
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       final docBoundingBox = (_docLayoutKey.currentState as DocumentLayout)
-          .getRectForSelection(_composer.selection!.base, _composer.selection!.extent)!;
-      final docBox = _docLayoutKey.currentContext!.findRenderObject() as RenderBox;
+          .getRectForSelection(
+              _composer.selection!.base, _composer.selection!.extent)!;
+      final docBox =
+          _docLayoutKey.currentContext!.findRenderObject() as RenderBox;
       final overlayBoundingBox = Rect.fromPoints(
         docBox.localToGlobal(docBoundingBox.topLeft),
         docBox.localToGlobal(docBoundingBox.bottomRight),
@@ -294,7 +317,10 @@ class _ExampleEditorState extends State<ExampleEditor> {
                       listenable: _composer.selectionNotifier,
                       builder: (context, child) {
                         return Padding(
-                          padding: EdgeInsets.only(bottom: _isMobile && _composer.selection != null ? 48 : 0),
+                          padding: EdgeInsets.only(
+                              bottom: _isMobile && _composer.selection != null
+                                  ? 48
+                                  : 0),
                           child: child,
                         );
                       },
@@ -327,8 +353,12 @@ class _ExampleEditorState extends State<ExampleEditor> {
 
   Widget _buildDebugVisualsToggle() {
     return FloatingActionButton(
-      backgroundColor: _brightness.value == Brightness.light ? _darkBackground : _lightBackground,
-      foregroundColor: _brightness.value == Brightness.light ? _lightBackground : _darkBackground,
+      backgroundColor: _brightness.value == Brightness.light
+          ? _darkBackground
+          : _lightBackground,
+      foregroundColor: _brightness.value == Brightness.light
+          ? _lightBackground
+          : _darkBackground,
       elevation: 5,
       onPressed: () {
         setState(() {
@@ -348,11 +378,17 @@ class _ExampleEditorState extends State<ExampleEditor> {
 
   Widget _buildLightAndDarkModeToggle() {
     return FloatingActionButton(
-      backgroundColor: _brightness.value == Brightness.light ? _darkBackground : _lightBackground,
-      foregroundColor: _brightness.value == Brightness.light ? _lightBackground : _darkBackground,
+      backgroundColor: _brightness.value == Brightness.light
+          ? _darkBackground
+          : _lightBackground,
+      foregroundColor: _brightness.value == Brightness.light
+          ? _lightBackground
+          : _darkBackground,
       elevation: 5,
       onPressed: () {
-        _brightness.value = _brightness.value == Brightness.light ? Brightness.dark : Brightness.light;
+        _brightness.value = _brightness.value == Brightness.light
+            ? Brightness.dark
+            : Brightness.light;
       },
       child: _brightness.value == Brightness.light
           ? const Icon(
@@ -365,6 +401,8 @@ class _ExampleEditorState extends State<ExampleEditor> {
   }
 
   Widget _buildEditor(BuildContext context) {
+    final notifier = context.read<ExampleEditorNotifier>();
+    final doc = notifier.doc;
     final isLight = Theme.of(context).brightness == Brightness.light;
 
     return ColoredBox(
@@ -377,14 +415,15 @@ class _ExampleEditorState extends State<ExampleEditor> {
             controller: _iosControlsController,
             child: SuperEditor(
               editor: _docEditor,
-              document: _doc,
+              document: doc,
               composer: _composer,
               focusNode: _editorFocusNode,
-              scrollController: _scrollController,
+              scrollController: notifier.scrollController,
               documentLayoutKey: _docLayoutKey,
               documentOverlayBuilders: [
                 DefaultCaretOverlayBuilder(
-                  caretStyle: const CaretStyle().copyWith(color: isLight ? Colors.black : Colors.redAccent),
+                  caretStyle: const CaretStyle().copyWith(
+                      color: isLight ? Colors.black : Colors.redAccent),
                 ),
                 if (defaultTargetPlatform == TargetPlatform.iOS) ...[
                   SuperEditorIosHandlesDocumentLayerBuilder(),
@@ -413,7 +452,9 @@ class _ExampleEditorState extends State<ExampleEditor> {
               ],
               gestureMode: _gestureMode,
               inputSource: _inputSource,
-              keyboardActions: _inputSource == TextInputSource.ime ? defaultImeKeyboardActions : defaultKeyboardActions,
+              keyboardActions: _inputSource == TextInputSource.ime
+                  ? defaultImeKeyboardActions
+                  : defaultKeyboardActions,
               androidToolbarBuilder: (_) => _buildAndroidFloatingToolbar(),
               overlayController: _overlayController,
               plugins: {
@@ -444,6 +485,8 @@ class _ExampleEditorState extends State<ExampleEditor> {
   }
 
   Widget _buildMountedToolbar() {
+    final notifier = context.read<ExampleEditorNotifier>();
+    final doc = notifier.doc;
     return MultiListenableBuilder(
       listenables: <Listenable>{
         _docChangeSignal,
@@ -458,7 +501,7 @@ class _ExampleEditorState extends State<ExampleEditor> {
 
         return KeyboardEditingToolbar(
           editor: _docEditor,
-          document: _doc,
+          document: doc,
           composer: _composer,
           commonOps: _docOps,
         );
@@ -467,25 +510,30 @@ class _ExampleEditorState extends State<ExampleEditor> {
   }
 
   Widget _buildFloatingToolbar(BuildContext context) {
+    final notifier = context.read<ExampleEditorNotifier>();
+    final doc = notifier.doc;
     return EditorToolbar(
       editorViewportKey: _viewportKey,
       anchor: _selectionLayerLinks.expandedSelectionBoundsLink,
       editorFocusNode: _editorFocusNode,
       editor: _docEditor,
-      document: _doc,
+      document: doc,
       composer: _composer,
       closeToolbar: _hideEditorToolbar,
     );
   }
 
   Widget _buildImageToolbar(BuildContext context) {
+    final notifier = context.read<ExampleEditorNotifier>();
+    final doc = notifier.doc;
     return ImageFormatToolbar(
       anchor: _imageSelectionAnchor,
       composer: _composer,
       setWidth: (nodeId, width) {
         print("Applying width $width to node $nodeId");
-        final node = _doc.getNodeById(nodeId)!;
-        final currentStyles = SingleColumnLayoutComponentStyles.fromMetadata(node);
+        final node = doc.getNodeById(nodeId)!;
+        final currentStyles =
+            SingleColumnLayoutComponentStyles.fromMetadata(node);
 
         _docEditor.execute([
           ChangeSingleColumnLayoutComponentStylesRequest(

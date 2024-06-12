@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
@@ -519,6 +520,7 @@ class _IosDocumentTouchInteractorState extends State<IosDocumentTouchInteractor>
 
   bool _wasScrollingOnTapDown = false;
   void _onTapDown(TapDownDetails details) {
+    log('_onTapDown registered');
     // When the user scrolls and releases, the scrolling continues with momentum.
     // If the user then taps down again, the momentum stops. When this happens, we
     // still receive tap callbacks. But we don't want to take any further action,
@@ -538,9 +540,9 @@ class _IosDocumentTouchInteractorState extends State<IosDocumentTouchInteractor>
 
     _globalTapDownOffset = details.globalPosition;
     _tapDownLongPressTimer?.cancel();
-    if (!disableLongPressSelectionForSuperlist) {
-      _tapDownLongPressTimer = Timer(kLongPressTimeout, _onLongPressDown);
-    }
+    // if (!disableLongPressSelectionForSuperlist) {
+    //   _tapDownLongPressTimer = Timer(kLongPressTimeout, _onLongPressDown);
+    // }
 
     // Stop the caret from blinking, in case this tap down turns into a long-press drag,
     // or a caret drag.
@@ -1075,6 +1077,7 @@ class _IosDocumentTouchInteractorState extends State<IosDocumentTouchInteractor>
   }
 
   void _onLongPressEnd() {
+    log('_onLongPressEnd');
     _longPressStrategy!.onLongPressEnd();
     _longPressStrategy = null;
     _dragMode = null;

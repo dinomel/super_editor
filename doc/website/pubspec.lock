@@ -524,9 +524,11 @@ packages:
   static_shock:
     dependency: "direct main"
     description:
-      path: "/Users/matt/Projects/static_shock/packages/static_shock"
-      relative: false
-    source: path
+      path: "packages/static_shock"
+      ref: HEAD
+      resolved-ref: "156589fc3cec13a679b229e10ab075577c21abfe"
+      url: "https://github.com/flutter-bounty-Hunters/static_shock"
+    source: git
     version: "0.0.5"
   stream_channel:
     dependency: transitive

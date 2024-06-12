@@ -37,10 +37,10 @@ packages:
     dependency: transitive
     description:
       name: attributed_text
-      sha256: c55516a32a263bf73a8b4f55aede2771c682418f6e2fbc2a1acdf51debd79c33
+      sha256: "68d2752b9dcdcfe95ed9eb39b56ec20639f31c1b64a3614091e5cd0e754e0490"
       url: "https://pub.dev"
     source: hosted
-    version: "0.3.0"
+    version: "0.3.1"
   boolean_selector:
     dependency: transitive
     description:
@@ -382,7 +382,7 @@ packages:
       path: ".."
       relative: true
     source: path
-    version: "0.1.8"
+    version: "0.1.10"
   term_glyph:
     dependency: transitive
     description:
@@ -435,10 +435,10 @@ packages:
     dependency: transitive
     description:
       name: vm_service
-      sha256: e7d5ecd604e499358c5fe35ee828c0298a320d54455e791e9dcf73486bc8d9f0
+      sha256: "3923c89304b715fb1eb6423f017651664a03bf5f4b29983627c4da791f74a4ec"
       url: "https://pub.dev"
     source: hosted
-    version: "14.1.0"
+    version: "14.2.1"
   watcher:
     dependency: transitive
     description:

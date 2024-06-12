@@ -705,9 +705,9 @@ class _AndroidDocumentTouchInteractorState extends State<AndroidDocumentTouchInt
 
     _globalTapDownOffset = details.globalPosition;
     _tapDownLongPressTimer?.cancel();
-    if (!disableLongPressSelectionForSuperlist) {
-      _tapDownLongPressTimer = Timer(kLongPressTimeout, _onLongPressDown);
-    }
+    // if (!disableLongPressSelectionForSuperlist) {
+    //   _tapDownLongPressTimer = Timer(kLongPressTimeout, _onLongPressDown);
+    // }
   }
 
   void _onTapCancel() {

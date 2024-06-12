@@ -446,6 +446,7 @@ class SingleColumnLayoutViewModel {
   SingleColumnLayoutComponentViewModel? getComponentViewModelByNodeId(String nodeId) => _viewModelsByNodeId[nodeId];
 }
 
+//DINO POGLEDAJ
 /// Base class for a component view model that appears within a
 /// [SingleColumnDocumentLayout].
 abstract class SingleColumnLayoutComponentViewModel {

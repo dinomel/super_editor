@@ -3,7 +3,6 @@ import 'dart:math';
 import 'package:example/demos/infrastructure/super_editor_item_selector.dart';
 import 'package:example/logging.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:follow_the_leader/follow_the_leader.dart';
 import 'package:overlord/follow_the_leader.dart';
 import 'package:super_editor/super_editor.dart';
@@ -447,22 +446,23 @@ class _EditorToolbarState extends State<EditorToolbar> {
   /// Returns the localized name for the given [_TextType], e.g.,
   /// "Paragraph" or "Header 1".
   String _getTextTypeName(_TextType textType) {
-    switch (textType) {
-      case _TextType.header1:
-        return AppLocalizations.of(context)!.labelHeader1;
-      case _TextType.header2:
-        return AppLocalizations.of(context)!.labelHeader2;
-      case _TextType.header3:
-        return AppLocalizations.of(context)!.labelHeader3;
-      case _TextType.paragraph:
-        return AppLocalizations.of(context)!.labelParagraph;
-      case _TextType.blockquote:
-        return AppLocalizations.of(context)!.labelBlockquote;
-      case _TextType.orderedListItem:
-        return AppLocalizations.of(context)!.labelOrderedListItem;
-      case _TextType.unorderedListItem:
-        return AppLocalizations.of(context)!.labelUnorderedListItem;
-    }
+    return textType.name;
+    // switch (textType) {
+    //   case _TextType.header1:
+    //     return AppLocalizations.of(context)!.labelHeader1;
+    //   case _TextType.header2:
+    //     return AppLocalizations.of(context)!.labelHeader2;
+    //   case _TextType.header3:
+    //     return AppLocalizations.of(context)!.labelHeader3;
+    //   case _TextType.paragraph:
+    //     return AppLocalizations.of(context)!.labelParagraph;
+    //   case _TextType.blockquote:
+    //     return AppLocalizations.of(context)!.labelBlockquote;
+    //   case _TextType.orderedListItem:
+    //     return AppLocalizations.of(context)!.labelOrderedListItem;
+    //   case _TextType.unorderedListItem:
+    //     return AppLocalizations.of(context)!.labelUnorderedListItem;
+    // }
   }
 
   void _onPerformAction(TextInputAction action) {
@@ -542,7 +542,7 @@ class _EditorToolbarState extends State<EditorToolbar> {
               // the currently selected node can be converted.
               if (_isConvertibleNode()) ...[
                 Tooltip(
-                  message: AppLocalizations.of(context)!.labelTextBlockType,
+                  message: 'labelTextBlockType',
                   child: _buildBlockTypeSelector(),
                 ),
                 _buildVerticalDivider(),
@@ -552,7 +552,7 @@ class _EditorToolbarState extends State<EditorToolbar> {
                   onPressed: _toggleBold,
                   icon: const Icon(Icons.format_bold),
                   splashRadius: 16,
-                  tooltip: AppLocalizations.of(context)!.labelBold,
+                  tooltip: 'labelBold',
                 ),
               ),
               Center(
@@ -560,7 +560,7 @@ class _EditorToolbarState extends State<EditorToolbar> {
                   onPressed: _toggleItalics,
                   icon: const Icon(Icons.format_italic),
                   splashRadius: 16,
-                  tooltip: AppLocalizations.of(context)!.labelItalics,
+                  tooltip: 'labelItalics',
                 ),
               ),
               Center(
@@ -568,7 +568,7 @@ class _EditorToolbarState extends State<EditorToolbar> {
                   onPressed: _toggleStrikethrough,
                   icon: const Icon(Icons.strikethrough_s),
                   splashRadius: 16,
-                  tooltip: AppLocalizations.of(context)!.labelStrikethrough,
+                  tooltip: 'labelStrikethrough',
                 ),
               ),
               Center(
@@ -577,7 +577,7 @@ class _EditorToolbarState extends State<EditorToolbar> {
                   icon: const Icon(Icons.link),
                   color: _isSingleLinkSelected() ? const Color(0xFF007AFF) : IconTheme.of(context).color,
                   splashRadius: 16,
-                  tooltip: AppLocalizations.of(context)!.labelLink,
+                  tooltip: 'labelLink',
                 ),
               ),
               // Only display alignment controls if the currently selected text
@@ -588,7 +588,7 @@ class _EditorToolbarState extends State<EditorToolbar> {
                   children: [
                     _buildVerticalDivider(),
                     Tooltip(
-                      message: AppLocalizations.of(context)!.labelTextAlignment,
+                      message: 'labelTextAlignment',
                       child: _buildAlignmentSelector(),
                     ),
                   ],
@@ -600,7 +600,7 @@ class _EditorToolbarState extends State<EditorToolbar> {
                   onPressed: () {},
                   icon: const Icon(Icons.more_vert),
                   splashRadius: 16,
-                  tooltip: AppLocalizations.of(context)!.labelMoreOptions,
+                  tooltip: 'labelMoreOptions',
                 ),
               ),
             ],
@@ -831,7 +831,7 @@ class _ImageFormatToolbarState extends State<ImageFormatToolbar> {
                   onPressed: _makeImageConfined,
                   icon: const Icon(Icons.photo_size_select_large),
                   splashRadius: 16,
-                  tooltip: AppLocalizations.of(context)!.labelLimitedWidth,
+                  tooltip: 'labelLimitedWidth',
                 ),
               ),
               Center(
@@ -839,7 +839,7 @@ class _ImageFormatToolbarState extends State<ImageFormatToolbar> {
                   onPressed: _makeImageFullBleed,
                   icon: const Icon(Icons.photo_size_select_actual),
                   splashRadius: 16,
-                  tooltip: AppLocalizations.of(context)!.labelFullWidth,
+                  tooltip: 'labelFullWidth',
                 ),
               ),
             ],

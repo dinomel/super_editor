@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:example/demos/components/demo_text_with_hint.dart';
 import 'package:example/demos/components/demo_unselectable_hr.dart';
 import 'package:example/demos/debugging/simple_deltas_input.dart';
@@ -10,7 +12,9 @@ import 'package:example/demos/demo_rtl.dart';
 import 'package:example/demos/demo_selectable_text.dart';
 import 'package:example/demos/editor_configs/demo_mobile_editing_android.dart';
 import 'package:example/demos/editor_configs/demo_mobile_editing_ios.dart';
+import 'package:example/demos/example_editor/_example_document.dart';
 import 'package:example/demos/example_editor/example_editor.dart';
+import 'package:super_editor/src/default_editor/example_editor_notifier.dart';
 import 'package:example/demos/flutter_features/demo_inline_widgets.dart';
 import 'package:example/demos/flutter_features/textinputclient/basic_text_input_client.dart';
 import 'package:example/demos/flutter_features/textinputclient/textfield.dart';
@@ -26,9 +30,9 @@ import 'package:example/demos/super_reader/demo_super_reader.dart';
 import 'package:example/demos/supertextfield/demo_textfield.dart';
 import 'package:example/demos/supertextfield/ios/demo_superiostextfield.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:logging/logging.dart';
+import 'package:provider/provider.dart';
 import 'package:super_editor/super_editor.dart';
 
 import 'demos/demo_attributed_text.dart';
@@ -71,12 +75,6 @@ class SuperEditorDemoApp extends StatelessWidget {
       supportedLocales: const [
         Locale('en', ''),
         Locale('es', ''),
-      ],
-      localizationsDelegates: const [
-        ...AppLocalizations.localizationsDelegates,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
       ],
       debugShowCheckedModeBanner: false,
     );
@@ -212,7 +210,12 @@ final _menu = <_MenuGroup>[
         icon: Icons.description,
         title: 'Editor Demo',
         pageBuilder: (context) {
-          return ExampleEditor();
+          return ChangeNotifierProvider(
+              create: (_) =>
+                  ExampleEditorNotifier(doc: createInitialDocument()),
+              builder: (_, __) {
+                return ExampleEditor();
+              });
         },
       ),
       _MenuItem(
@@ -578,10 +581,11 @@ class _DrawerButton extends StatelessWidget {
               return Colors.transparent;
             }),
             // splashFactory: NoSplash.splashFactory,
-            foregroundColor:
-                WidgetStateColor.resolveWith((states) => isSelected ? Colors.white : const Color(0xFFBBBBBB)),
+            foregroundColor: WidgetStateColor.resolveWith((states) =>
+                isSelected ? Colors.white : const Color(0xFFBBBBBB)),
             elevation: WidgetStateProperty.resolveWith((states) => 0),
-            padding: WidgetStateProperty.resolveWith((states) => const EdgeInsets.all(16))),
+            padding: WidgetStateProperty.resolveWith(
+                (states) => const EdgeInsets.all(16))),
         onPressed: isSelected ? null : onPressed,
         child: Row(
           children: [
