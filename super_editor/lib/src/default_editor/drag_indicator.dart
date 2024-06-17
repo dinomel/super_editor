@@ -1,5 +1,9 @@
+import 'dart:developer';
+
 import 'package:attributed_text/attributed_text.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:super_editor/src/default_editor/editor_notifier.dart';
 import 'package:super_editor/src/default_editor/layout_single_column/selection_aware_viewmodel.dart';
 import 'package:super_editor/src/default_editor/selection_upstream_downstream.dart';
 
@@ -9,11 +13,11 @@ import 'layout_single_column/layout_single_column.dart';
 
 /// [DocumentNode] for a horizontal rule, which represents a full-width
 /// horizontal separation in a document.
-class HorizontalRuleNode extends BlockNode with ChangeNotifier {
-  HorizontalRuleNode({
+class DragIndicatorNode extends BlockNode with ChangeNotifier {
+  DragIndicatorNode({
     required this.id,
   }) {
-    putMetadataValue("blockType", const NamedAttribution("horizontalRule"));
+    putMetadataValue("blockType", const NamedAttribution('dragIndicator'));
   }
 
   @override
@@ -22,7 +26,10 @@ class HorizontalRuleNode extends BlockNode with ChangeNotifier {
   @override
   String? copyContent(dynamic selection) {
     if (selection is! UpstreamDownstreamNodeSelection) {
-      throw Exception('HorizontalRuleNode can only copy content from a UpstreamDownstreamNodeSelection.');
+      throw Exception(
+        'HorizontalRuleNode can only copy content from '
+        'a UpstreamDownstreamNodeSelection.',
+      );
     }
 
     return !selection.isCollapsed ? '---' : null;
@@ -30,27 +37,31 @@ class HorizontalRuleNode extends BlockNode with ChangeNotifier {
 
   @override
   bool hasEquivalentContent(DocumentNode other) {
-    return other is HorizontalRuleNode;
+    return other is DragIndicatorNode;
   }
 
   @override
   bool operator ==(Object other) =>
-      identical(this, other) || other is HorizontalRuleNode && runtimeType == other.runtimeType && id == other.id;
+      identical(this, other) ||
+      other is DragIndicatorNode &&
+          runtimeType == other.runtimeType &&
+          id == other.id;
 
   @override
   int get hashCode => id.hashCode;
 }
 
-class HorizontalRuleComponentBuilder implements ComponentBuilder {
-  const HorizontalRuleComponentBuilder();
+class DragIndicatorComponentBuilder implements ComponentBuilder {
+  const DragIndicatorComponentBuilder();
 
   @override
-  SingleColumnLayoutComponentViewModel? createViewModel(Document document, DocumentNode node) {
-    if (node is! HorizontalRuleNode) {
+  SingleColumnLayoutComponentViewModel? createViewModel(
+      Document document, DocumentNode node) {
+    if (node is! DragIndicatorNode) {
       return null;
     }
 
-    return HorizontalRuleComponentViewModel(
+    return DragIndicatorComponentViewModel(
       nodeId: node.id,
       selectionColor: const Color(0x00000000),
       caretColor: const Color(0x00000000),
@@ -58,15 +69,17 @@ class HorizontalRuleComponentBuilder implements ComponentBuilder {
   }
 
   @override
-  Widget? createComponent(
-      SingleColumnDocumentComponentContext componentContext, SingleColumnLayoutComponentViewModel componentViewModel) {
-    if (componentViewModel is! HorizontalRuleComponentViewModel) {
+  Widget? createComponent(SingleColumnDocumentComponentContext componentContext,
+      SingleColumnLayoutComponentViewModel componentViewModel) {
+    if (componentViewModel is! DragIndicatorComponentViewModel) {
       return null;
     }
 
-    return HorizontalRuleComponent(
+    return DragIndicatorComponent(
+      nodeId: componentViewModel.nodeId,
       componentKey: componentContext.componentKey,
-      selection: componentViewModel.selection?.nodeSelection as UpstreamDownstreamNodeSelection?,
+      selection: componentViewModel.selection?.nodeSelection
+          as UpstreamDownstreamNodeSelection?,
       selectionColor: componentViewModel.selectionColor,
       showCaret: componentViewModel.caret != null,
       caretColor: componentViewModel.caretColor,
@@ -74,8 +87,10 @@ class HorizontalRuleComponentBuilder implements ComponentBuilder {
   }
 }
 
-class HorizontalRuleComponentViewModel extends SingleColumnLayoutComponentViewModel with SelectionAwareViewModelMixin {
-  HorizontalRuleComponentViewModel({
+class DragIndicatorComponentViewModel
+    extends SingleColumnLayoutComponentViewModel
+    with SelectionAwareViewModelMixin {
+  DragIndicatorComponentViewModel({
     required super.nodeId,
     super.maxWidth,
     super.padding = EdgeInsets.zero,
@@ -92,8 +107,8 @@ class HorizontalRuleComponentViewModel extends SingleColumnLayoutComponentViewMo
   Color caretColor;
 
   @override
-  HorizontalRuleComponentViewModel copy() {
-    return HorizontalRuleComponentViewModel(
+  DragIndicatorComponentViewModel copy() {
+    return DragIndicatorComponentViewModel(
       nodeId: nodeId,
       maxWidth: maxWidth,
       padding: padding,
@@ -107,14 +122,14 @@ class HorizontalRuleComponentViewModel extends SingleColumnLayoutComponentViewMo
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-          super == other &&
-              other is HorizontalRuleComponentViewModel &&
-              runtimeType == other.runtimeType &&
-              nodeId == other.nodeId &&
-              selection == other.selection &&
-              selectionColor == other.selectionColor &&
-              caret == other.caret &&
-              caretColor == other.caretColor;
+      super == other &&
+          other is DragIndicatorComponentViewModel &&
+          runtimeType == other.runtimeType &&
+          nodeId == other.nodeId &&
+          selection == other.selection &&
+          selectionColor == other.selectionColor &&
+          caret == other.caret &&
+          caretColor == other.caretColor;
 
   @override
   int get hashCode =>
@@ -127,10 +142,11 @@ class HorizontalRuleComponentViewModel extends SingleColumnLayoutComponentViewMo
 }
 
 /// Displays a horizontal rule in a document.
-class HorizontalRuleComponent extends StatelessWidget {
-  const HorizontalRuleComponent({
+class DragIndicatorComponent extends StatelessWidget {
+  const DragIndicatorComponent({
     Key? key,
     required this.componentKey,
+    required this.nodeId,
     this.color = Colors.grey,
     this.thickness = 1,
     this.selectionColor = Colors.blue,
@@ -139,6 +155,7 @@ class HorizontalRuleComponent extends StatelessWidget {
     this.showCaret = false,
   }) : super(key: key);
 
+  final String nodeId;
   final GlobalKey componentKey;
   final Color color;
   final double thickness;
@@ -149,18 +166,25 @@ class HorizontalRuleComponent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return IgnorePointer(
-      child: SelectableBox(
-        selection: selection,
-        selectionColor: selectionColor,
-        child: BoxComponent(
-          key: componentKey,
-          child: Divider(
-            color: color,
-            thickness: thickness,
+    return Selector<EditorNotifier, bool>(
+      selector: (_, notifier) => notifier.isDragNodeVisible(nodeId),
+      builder: (_, isDragNodeVisible, __) {
+        log('nodeID: $nodeId, isDragNodeVisible: $isDragNodeVisible');
+        return IgnorePointer(
+          child: SelectableBox(
+            selection: selection,
+            selectionColor: selectionColor,
+            child: BoxComponent(
+              key: componentKey,
+              child: Divider(
+                height: 0,
+                color: isDragNodeVisible ? color : Colors.transparent,
+                thickness: thickness,
+              ),
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 }

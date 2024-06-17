@@ -1,6 +1,6 @@
 import 'dart:developer';
 
-import 'package:super_editor/src/default_editor/example_editor_notifier.dart';
+import 'package:super_editor/src/default_editor/editor_notifier.dart';
 import 'package:example/logging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -54,7 +54,7 @@ class _ExampleEditorState extends State<ExampleEditor> {
   @override
   void initState() {
     super.initState();
-    final notifier = context.read<ExampleEditorNotifier>();
+    final notifier = context.read<EditorNotifier>();
     final doc = notifier.doc;
     doc.addListener(_onDocumentChange);
     _composer = MutableDocumentComposer();
@@ -100,7 +100,7 @@ class _ExampleEditorState extends State<ExampleEditor> {
   }
 
   void _hideOrShowToolbar() {
-    final notifier = context.read<ExampleEditorNotifier>();
+    final notifier = context.read<EditorNotifier>();
     final doc = notifier.doc;
 
     if (_gestureMode != DocumentGestureMode.mouse) {
@@ -401,7 +401,7 @@ class _ExampleEditorState extends State<ExampleEditor> {
   }
 
   Widget _buildEditor(BuildContext context) {
-    final notifier = context.read<ExampleEditorNotifier>();
+    final notifier = context.read<EditorNotifier>();
     final doc = notifier.doc;
     final isLight = Theme.of(context).brightness == Brightness.light;
 
@@ -485,7 +485,7 @@ class _ExampleEditorState extends State<ExampleEditor> {
   }
 
   Widget _buildMountedToolbar() {
-    final notifier = context.read<ExampleEditorNotifier>();
+    final notifier = context.read<EditorNotifier>();
     final doc = notifier.doc;
     return MultiListenableBuilder(
       listenables: <Listenable>{
@@ -510,7 +510,7 @@ class _ExampleEditorState extends State<ExampleEditor> {
   }
 
   Widget _buildFloatingToolbar(BuildContext context) {
-    final notifier = context.read<ExampleEditorNotifier>();
+    final notifier = context.read<EditorNotifier>();
     final doc = notifier.doc;
     return EditorToolbar(
       editorViewportKey: _viewportKey,
@@ -524,7 +524,7 @@ class _ExampleEditorState extends State<ExampleEditor> {
   }
 
   Widget _buildImageToolbar(BuildContext context) {
-    final notifier = context.read<ExampleEditorNotifier>();
+    final notifier = context.read<EditorNotifier>();
     final doc = notifier.doc;
     return ImageFormatToolbar(
       anchor: _imageSelectionAnchor,

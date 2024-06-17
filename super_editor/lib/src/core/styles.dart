@@ -175,7 +175,11 @@ class BlockSelector {
     }
 
     if (_precedingBlockType != null) {
-      final nodeBefore = document.getNodeBefore(node);
+      DocumentNode? nodeBefore = document.getNodeBefore(node);
+      //TODO: Dino pogledaj
+      if(nodeBefore != null) {
+        nodeBefore = document.getNodeBefore(nodeBefore);
+      }
       if (nodeBefore == null ||
           (nodeBefore.getMetadataValue("blockType") as NamedAttribution?)?.name != _precedingBlockType) {
         return false;

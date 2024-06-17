@@ -8,7 +8,7 @@ import 'package:provider/provider.dart';
 import 'package:super_editor/src/core/document.dart';
 import 'package:super_editor/src/core/document_layout.dart';
 import 'package:super_editor/src/core/document_selection.dart';
-import 'package:super_editor/src/default_editor/example_editor_notifier.dart';
+import 'package:super_editor/src/default_editor/editor_notifier.dart';
 import 'package:super_editor/src/infrastructure/_logging.dart';
 
 import '_presenter.dart';
@@ -1013,7 +1013,7 @@ class _PresenterComponentBuilderState
 /// The specific widget that's build is determined by the given
 /// [componentBuilders]. The component widget is rebuilt whenever the
 /// given [presenter] reports that the
-class _Component extends StatefulWidget {
+class _Component extends StatelessWidget {
   const _Component({
     Key? key,
     required this.componentBuilders,
@@ -1044,53 +1044,38 @@ class _Component extends StatefulWidget {
   final int Function(double) findComponentIndexAtOffset;
 
   @override
-  State<_Component> createState() => _ComponentState();
-}
-
-class _ComponentState extends State<_Component> {
-  int? dragIndex;
-
-  @override
   Widget build(BuildContext context) {
     final componentContext = SingleColumnDocumentComponentContext(
       context: context,
-      componentKey: widget.componentKey,
+      componentKey: componentKey,
     );
     final feedbackContext = SingleColumnDocumentComponentContext(
       context: context,
       componentKey: GlobalKey(),
     );
-    for (final componentBuilder in widget.componentBuilders) {
+    for (final componentBuilder in componentBuilders) {
       var component = componentBuilder.createComponent(
         componentContext,
-        widget.componentViewModel,
+        componentViewModel,
       );
       var feedback = componentBuilder.createComponent(
         feedbackContext,
-        widget.componentViewModel,
+        componentViewModel,
       );
-      final notifier = context.read<ExampleEditorNotifier>();
+      final notifier = context.read<EditorNotifier>();
       if (component != null) {
         // TODO: we might need a SizeChangedNotifier here for the case where two components
         //       change size exactly inversely
         component = LongPressDraggable(
           hitTestBehavior: HitTestBehavior.translucent,
           onDragUpdate: (details) {
-            dragIndex = widget.findComponentIndexAtOffset(
-                details.globalPosition.dy + notifier.scrollController.offset);
-            print('details.offset.dy: ${details.globalPosition.dy}');
-            print('dragIndex: $dragIndex');
-          },
-          onDragEnd: (_) {
-            if (dragIndex == null ||
-                dragIndex! < 0 ||
-                dragIndex! >= notifier.doc.nodes.length) return;
-            notifier.doc.moveNode(
-              nodeId: widget.componentViewModel.nodeId,
-              targetIndex: dragIndex!,
+            notifier.onDragUpdate(
+              details,
+              findComponentIndexAtOffset,
+              // componentViewModel.nodeId,
             );
-            dragIndex = null;
           },
+          onDragEnd: (_) => notifier.onDragEnd(componentViewModel.nodeId),
           feedback: Material(
             color: Colors.transparent,
             child: ConstrainedBox(
@@ -1100,45 +1085,43 @@ class _ComponentState extends State<_Component> {
               child: SizedBox(
                 width: double.infinity,
                 child: Padding(
-                  padding: widget.componentViewModel.padding,
+                  padding: componentViewModel.padding,
                   child: feedback,
                 ),
               ),
             ),
           ),
           childWhenDragging: Opacity(
+            // key: ValueKey('lpd-${componentViewModel.nodeId}'),
             opacity: 0.3,
             child: ConstrainedBox(
               constraints: BoxConstraints(
-                  maxWidth:
-                      widget.componentViewModel.maxWidth ?? double.infinity),
+                  maxWidth: componentViewModel.maxWidth ?? double.infinity),
               child: SizedBox(
                 width: double.infinity,
                 child: Padding(
-                  padding: widget.componentViewModel.padding,
+                  padding: componentViewModel.padding,
                   child: component,
                 ),
               ),
             ),
           ),
           child: ConstrainedBox(
-            key: GlobalObjectKey(widget.componentViewModel.nodeId),
+            key: GlobalObjectKey(componentViewModel.nodeId),
             constraints: BoxConstraints(
-                maxWidth:
-                    widget.componentViewModel.maxWidth ?? double.infinity),
+                maxWidth: componentViewModel.maxWidth ?? double.infinity),
             child: SizedBox(
               width: double.infinity,
               child: Padding(
-                padding: widget.componentViewModel.padding,
+                //TODO: Dino ovo postavi na zero kod dragIndicatorNode
+                padding: componentViewModel.padding,
                 child: component,
               ),
             ),
           ),
         );
 
-        return widget.showDebugPaint
-            ? _wrapWithDebugWidget(component)
-            : component;
+        return showDebugPaint ? _wrapWithDebugWidget(component) : component;
       }
     }
     return const SizedBox();

@@ -14,7 +14,7 @@ import 'package:example/demos/editor_configs/demo_mobile_editing_android.dart';
 import 'package:example/demos/editor_configs/demo_mobile_editing_ios.dart';
 import 'package:example/demos/example_editor/_example_document.dart';
 import 'package:example/demos/example_editor/example_editor.dart';
-import 'package:super_editor/src/default_editor/example_editor_notifier.dart';
+import 'package:super_editor/src/default_editor/editor_notifier.dart';
 import 'package:example/demos/flutter_features/demo_inline_widgets.dart';
 import 'package:example/demos/flutter_features/textinputclient/basic_text_input_client.dart';
 import 'package:example/demos/flutter_features/textinputclient/textfield.dart';
@@ -211,8 +211,7 @@ final _menu = <_MenuGroup>[
         title: 'Editor Demo',
         pageBuilder: (context) {
           return ChangeNotifierProvider(
-              create: (_) =>
-                  ExampleEditorNotifier(doc: createInitialDocument()),
+              create: (_) => EditorNotifier(doc: createInitialDocument()),
               builder: (_, __) {
                 return ExampleEditor();
               });

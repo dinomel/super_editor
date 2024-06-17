@@ -465,9 +465,11 @@ abstract class SingleColumnLayoutComponentViewModel {
   /// The padding applied around this component.
   EdgeInsetsGeometry padding;
 
+  //TODO: DINO OVDE
   void applyStyles(Map<String, dynamic> styles) {
     maxWidth = styles[Styles.maxWidth] ?? double.infinity;
     padding = (styles[Styles.padding] as CascadingPadding?)?.toEdgeInsets() ?? EdgeInsets.zero;
+    // padding = EdgeInsets.zero;
   }
 
   SingleColumnLayoutComponentViewModel copy();
