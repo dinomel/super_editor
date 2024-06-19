@@ -2,6 +2,8 @@ import 'dart:math';
 
 import 'package:attributed_text/attributed_text.dart';
 import 'package:collection/collection.dart';
+import 'package:flutter/material.dart';
+import 'package:super_editor/src/default_editor/drag_indicator.dart';
 import 'package:super_editor/src/default_editor/paragraph.dart';
 import 'package:super_editor/src/infrastructure/_logging.dart';
 import 'package:uuid/uuid.dart';
@@ -168,7 +170,8 @@ class Editor implements RequestDispatcher {
           editable.onTransactionEnd(_activeChangeList!);
         }
       } else {
-        editorOpsLog.warning("We have an empty change list after processing one or more requests: $requests");
+        editorOpsLog.warning(
+            "We have an empty change list after processing one or more requests: $requests");
       }
 
       _activeChangeList = null;
@@ -220,7 +223,8 @@ class Editor implements RequestDispatcher {
   }
 
   void _notifyListeners() {
-    final changeList = List<EditEvent>.from(_activeChangeList!, growable: false);
+    final changeList =
+        List<EditEvent>.from(_activeChangeList!, growable: false);
     for (final listener in _changeListeners) {
       // Note: we pass a given copy of the change list, because listeners should
       // never cause additional editor changes.
@@ -238,6 +242,7 @@ class _DocumentEditorCommandExecutor implements CommandExecutor {
   final _commandsBeingProcessed = EditorCommandQueue();
 
   final _changeList = <EditEvent>[];
+
   List<EditEvent> copyChangeList() => List.from(_changeList);
 
   @override
@@ -308,8 +313,10 @@ class EditContext {
   /// Finds an object of type [T] within this [EditContext], which is identified by the given [id].
   T find<T extends Editable>(String id) {
     if (!_resources.containsKey(id)) {
-      editorLog.shout("Tried to find an editor resource for the ID '$id', but there's no resource with that ID.");
-      throw Exception("Tried to find an editor resource for the ID '$id', but there's no resource with that ID.");
+      editorLog.shout(
+          "Tried to find an editor resource for the ID '$id', but there's no resource with that ID.");
+      throw Exception(
+          "Tried to find an editor resource for the ID '$id', but there's no resource with that ID.");
     }
     if (_resources[id] is! T) {
       editorLog.shout(
@@ -444,7 +451,10 @@ class DocumentEdit implements EditEvent {
 
   @override
   bool operator ==(Object other) =>
-      identical(this, other) || other is DocumentEdit && runtimeType == other.runtimeType && change == other.change;
+      identical(this, other) ||
+      other is DocumentEdit &&
+          runtimeType == other.runtimeType &&
+          change == other.change;
 
   @override
   int get hashCode => change.hashCode;
@@ -456,18 +466,20 @@ class DocumentEdit implements EditEvent {
 /// An [EditReaction] can use the given [executor] to spawn additional
 /// [EditCommand]s that should run in response to the [changeList].
 abstract class EditReaction {
-  void react(EditContext editorContext, RequestDispatcher requestDispatcher, List<EditEvent> changeList);
+  void react(EditContext editorContext, RequestDispatcher requestDispatcher,
+      List<EditEvent> changeList);
 }
 
 /// An [EditReaction] that delegates its reaction to a given callback function.
 class FunctionalEditReaction implements EditReaction {
   FunctionalEditReaction(this._react);
 
-  final void Function(EditContext editorContext, RequestDispatcher requestDispatcher, List<EditEvent> changeList)
-      _react;
+  final void Function(EditContext editorContext,
+      RequestDispatcher requestDispatcher, List<EditEvent> changeList) _react;
 
   @override
-  void react(EditContext editorContext, RequestDispatcher requestDispatcher, List<EditEvent> changeList) =>
+  void react(EditContext editorContext, RequestDispatcher requestDispatcher,
+          List<EditEvent> changeList) =>
       _react(editorContext, requestDispatcher, changeList);
 }
 
@@ -580,14 +592,18 @@ class MutableDocument implements Document, Editable {
   @override
   DocumentNode? getNodeAfter(DocumentNode node) {
     final nodeIndex = getNodeIndexById(node.id);
-    return nodeIndex >= 0 && nodeIndex < _nodes.length - 1 ? getNodeAt(nodeIndex + 1) : null;
+    return nodeIndex >= 0 && nodeIndex < _nodes.length - 1
+        ? getNodeAt(nodeIndex + 1)
+        : null;
   }
 
   @override
-  DocumentNode? getNode(DocumentPosition position) => getNodeById(position.nodeId);
+  DocumentNode? getNode(DocumentPosition position) =>
+      getNodeById(position.nodeId);
 
   @override
-  List<DocumentNode> getNodesInside(DocumentPosition position1, DocumentPosition position2) {
+  List<DocumentNode> getNodesInside(
+      DocumentPosition position1, DocumentPosition position2) {
     final node1 = getNode(position1);
     if (node1 == null) {
       throw Exception('No such position in document: $position1');
@@ -608,8 +624,16 @@ class MutableDocument implements Document, Editable {
 
   /// Inserts the given [node] into the [Document] at the given [index].
   void insertNodeAt(int index, DocumentNode node) {
+    print('MutableDocument: insertNodeAt index: $index');
     if (index <= _nodes.length) {
       _nodes.insert(index, node);
+      _nodes.insert(
+        index,
+        DragIndicatorNode(
+          id: Editor.createNodeId(),
+          color: Colors.green,
+        ),
+      );
       _refreshNodeIdCaches();
     }
   }
@@ -619,8 +643,17 @@ class MutableDocument implements Document, Editable {
     required DocumentNode existingNode,
     required DocumentNode newNode,
   }) {
+    print(
+        'MutableDocument: insertNodeBefore existingNode: ${existingNode.metadata} newNode: ${newNode.metadata}');
     final nodeIndex = _nodes.indexOf(existingNode);
     _nodes.insert(nodeIndex, newNode);
+    _nodes.insert(
+      nodeIndex,
+      DragIndicatorNode(
+        id: Editor.createNodeId(),
+        color: Colors.green,
+      ),
+    );
     _refreshNodeIdCaches();
   }
 
@@ -629,16 +662,34 @@ class MutableDocument implements Document, Editable {
     required DocumentNode existingNode,
     required DocumentNode newNode,
   }) {
+    print(
+        'MutableDocument: insertNodeAfter existingNode: ${existingNode.metadata} newNode: ${newNode.metadata}');
     final nodeIndex = _nodes.indexOf(existingNode);
     if (nodeIndex >= 0 && nodeIndex < _nodes.length) {
       _nodes.insert(nodeIndex + 1, newNode);
+      _nodes.insert(
+        nodeIndex + 1,
+        DragIndicatorNode(
+          id: Editor.createNodeId(),
+          color: Colors.green,
+        ),
+      );
       _refreshNodeIdCaches();
     }
   }
 
   /// Adds [node] to the end of the document.
   void add(DocumentNode node) {
+    print('MutableDocument: add node: ${node.metadata}');
     _nodes.insert(_nodes.length, node);
+
+    _nodes.insert(
+      _nodes.length,
+      DragIndicatorNode(
+        id: Editor.createNodeId(),
+        color: Colors.green,
+      ),
+    );
 
     // The node list changed, we need to update the map to consider the new indices.
     _refreshNodeIdCaches();
@@ -646,8 +697,11 @@ class MutableDocument implements Document, Editable {
 
   /// Deletes the node at the given [index].
   void deleteNodeAt(int index) {
+    print('MutableDocument: deleteNodeAt index: $index');
+    // if (index.isEven) return;
     if (index >= 0 && index < _nodes.length) {
-      _nodes.removeAt(index);
+      _nodes.removeAt(index - 1);
+      _nodes.removeAt(index - 1);
       _refreshNodeIdCaches();
     } else {
       editorDocLog.warning('Could not delete node. Index out of range: $index');
@@ -656,9 +710,13 @@ class MutableDocument implements Document, Editable {
 
   /// Deletes the given [node] from the [Document].
   bool deleteNode(DocumentNode node) {
+    print('MutableDocument: deleteNode node: ${node.metadata}');
     bool isRemoved = false;
 
+    final dragNode = getNodeBefore(node);
+    print('MutableDocument: dragNode: ${dragNode?.metadata}');
     isRemoved = _nodes.remove(node);
+    // _nodes.remove(dragNode);
     if (isRemoved) {
       _refreshNodeIdCaches();
     }
@@ -671,6 +729,8 @@ class MutableDocument implements Document, Editable {
   ///
   /// If none of the nodes in this document match [nodeId], throws an error.
   void moveNode({required String nodeId, required int targetIndex}) {
+    print(
+        'MutableDocument: moveNode nodeId: $nodeId, targetIndex: $targetIndex');
     final node = getNodeById(nodeId);
     if (node == null) {
       throw Exception('Could not find node with nodeId: $nodeId');
@@ -687,6 +747,8 @@ class MutableDocument implements Document, Editable {
     required DocumentNode oldNode,
     required DocumentNode newNode,
   }) {
+    print(
+        'MutableDocument: replaceNode oldNode: ${oldNode.metadata} newNode: ${newNode.metadata}');
     final index = _nodes.indexOf(oldNode);
 
     if (index != -1) {
@@ -737,7 +799,8 @@ class MutableDocument implements Document, Editable {
 
   @override
   void onTransactionEnd(List<EditEvent> edits) {
-    final documentChanges = edits.whereType<DocumentEdit>().map((edit) => edit.change).toList();
+    final documentChanges =
+        edits.whereType<DocumentEdit>().map((edit) => edit.change).toList();
     if (documentChanges.isEmpty) {
       return;
     }

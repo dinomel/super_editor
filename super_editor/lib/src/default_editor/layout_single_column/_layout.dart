@@ -824,7 +824,7 @@ class _SingleColumnDocumentLayoutState extends State<SingleColumnDocumentLayout>
               componentBuilders: widget.componentBuilders,
               componentKey: componentKey,
               componentViewModel: newComponentViewModel,
-              findComponentIndexAtOffset: _findComponentIndexAtOffset,
+              findClosestDragIndexAtOffset: _findClosestDragIndexAtOffset,
             );
           },
         ),
@@ -874,6 +874,25 @@ class _SingleColumnDocumentLayoutState extends State<SingleColumnDocumentLayout>
     }
     return _binarySearchComponentIndexAtOffset(
         dy, 0, _topToBottomComponentKeys.length - 1);
+  }
+
+  int _findClosestDragIndexAtOffset(double dy) {
+    if (_topToBottomComponentKeys.isEmpty) {
+      return -1;
+    }
+    int componentIndex = _binarySearchComponentIndexAtOffset(
+      dy,
+      0,
+      _topToBottomComponentKeys.length - 1,
+    );
+    if (componentIndex.isEven) return componentIndex;
+    final prevBound = _getComponentBoundsByIndex(componentIndex - 1);
+    final nextBound = _getComponentBoundsByIndex(componentIndex + 1);
+    if (dy - prevBound.top > nextBound.top - dy) {
+      return componentIndex + 1;
+    } else {
+      return componentIndex - 1;
+    }
   }
 
   /// Performs a binary search starting from [minIndex] to [maxIndex] to find
@@ -1019,7 +1038,7 @@ class _Component extends StatelessWidget {
     required this.componentBuilders,
     required this.componentViewModel,
     required this.componentKey,
-    required this.findComponentIndexAtOffset,
+    required this.findClosestDragIndexAtOffset,
     // ignore: unused_element
     this.showDebugPaint = false,
   }) : super(key: key);
@@ -1041,7 +1060,7 @@ class _Component extends StatelessWidget {
   /// Whether to add debug paint to the component.
   final bool showDebugPaint;
 
-  final int Function(double) findComponentIndexAtOffset;
+  final int Function(double) findClosestDragIndexAtOffset;
 
   @override
   Widget build(BuildContext context) {
@@ -1071,49 +1090,50 @@ class _Component extends StatelessWidget {
           onDragUpdate: (details) {
             notifier.onDragUpdate(
               details,
-              findComponentIndexAtOffset,
-              // componentViewModel.nodeId,
+              findClosestDragIndexAtOffset,
+              componentViewModel.nodeId,
             );
           },
           onDragEnd: (_) => notifier.onDragEnd(componentViewModel.nodeId),
           feedback: Material(
             color: Colors.transparent,
-            child: ConstrainedBox(
-              constraints: BoxConstraints(
-                maxWidth: MediaQuery.of(context).size.width,
-              ),
-              child: SizedBox(
-                width: double.infinity,
-                child: Padding(
-                  padding: componentViewModel.padding,
-                  child: feedback,
+            child: Opacity(
+              opacity: 0.6,
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  maxWidth: MediaQuery.of(context).size.width,
+                ),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: Padding(
+                    padding: componentViewModel.padding,
+                    child: feedback,
+                  ),
                 ),
               ),
             ),
           ),
-          childWhenDragging: Opacity(
-            // key: ValueKey('lpd-${componentViewModel.nodeId}'),
-            opacity: 0.3,
-            child: ConstrainedBox(
-              constraints: BoxConstraints(
-                  maxWidth: componentViewModel.maxWidth ?? double.infinity),
-              child: SizedBox(
-                width: double.infinity,
-                child: Padding(
-                  padding: componentViewModel.padding,
-                  child: component,
-                ),
-              ),
-            ),
-          ),
+          // childWhenDragging: Opacity(
+          //   // key: ValueKey('lpd-${componentViewModel.nodeId}'),
+          //   opacity: 0.3,
+          //   child: ConstrainedBox(
+          //     constraints: BoxConstraints(
+          //         maxWidth: componentViewModel.maxWidth ?? double.infinity),
+          //     child: SizedBox(
+          //       width: double.infinity,
+          //       child: Padding(
+          //         padding: componentViewModel.padding,
+          //         child: component,
+          //       ),
+          //     ),
+          //   ),
+          // ),
           child: ConstrainedBox(
-            key: GlobalObjectKey(componentViewModel.nodeId),
             constraints: BoxConstraints(
                 maxWidth: componentViewModel.maxWidth ?? double.infinity),
             child: SizedBox(
               width: double.infinity,
               child: Padding(
-                //TODO: Dino ovo postavi na zero kod dragIndicatorNode
                 padding: componentViewModel.padding,
                 child: component,
               ),

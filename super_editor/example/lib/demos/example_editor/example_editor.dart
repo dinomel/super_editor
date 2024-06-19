@@ -504,6 +504,7 @@ class _ExampleEditorState extends State<ExampleEditor> {
           document: doc,
           composer: _composer,
           commonOps: _docOps,
+          shouldAddKeyboardPadding: true,
         );
       },
     );

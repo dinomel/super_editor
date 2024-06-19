@@ -446,7 +446,6 @@ class SingleColumnLayoutViewModel {
   SingleColumnLayoutComponentViewModel? getComponentViewModelByNodeId(String nodeId) => _viewModelsByNodeId[nodeId];
 }
 
-//DINO POGLEDAJ
 /// Base class for a component view model that appears within a
 /// [SingleColumnDocumentLayout].
 abstract class SingleColumnLayoutComponentViewModel {
@@ -465,11 +464,9 @@ abstract class SingleColumnLayoutComponentViewModel {
   /// The padding applied around this component.
   EdgeInsetsGeometry padding;
 
-  //TODO: DINO OVDE
   void applyStyles(Map<String, dynamic> styles) {
     maxWidth = styles[Styles.maxWidth] ?? double.infinity;
     padding = (styles[Styles.padding] as CascadingPadding?)?.toEdgeInsets() ?? EdgeInsets.zero;
-    // padding = EdgeInsets.zero;
   }
 
   SingleColumnLayoutComponentViewModel copy();

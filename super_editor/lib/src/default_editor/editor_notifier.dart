@@ -20,14 +20,22 @@ class EditorNotifier extends ChangeNotifier {
   void onDragUpdate(
     DragUpdateDetails details,
     int Function(double) findComponentIndexAtOffset,
+    String nodeId,
   ) {
+    final nodeIndex = doc.getNodeIndexById(nodeId);
     final newIndex = findComponentIndexAtOffset(
       details.globalPosition.dy + scrollController.offset,
     );
-    if (dragIndex == newIndex || dragIndex == newIndex - 1) return;
+    if (dragIndex == newIndex) return;
+    // if (dragIndex == newIndex || dragIndex == newIndex - 1) return;
 
-    dragIndex = newIndex;
-    dragNodeID = doc.getNodeAt(newIndex + 1)?.id;
+    if (newIndex == nodeIndex + 1 || newIndex == nodeIndex - 1) {
+      dragIndex = null;
+      dragNodeID = null;
+    } else {
+      dragIndex = newIndex;
+      dragNodeID = doc.getNodeAt(newIndex)?.id;
+    }
     notifyListeners();
   }
 
@@ -43,11 +51,11 @@ class EditorNotifier extends ChangeNotifier {
     }
     doc.moveNode(
       nodeId: nodeId,
-      targetIndex: dragIndex! + 1,
+      targetIndex: dragIndex!,
     );
     doc.moveNode(
       nodeId: dragNode.id,
-      targetIndex: dragIndex! + 1,
+      targetIndex: dragIndex!,
     );
     dragIndex = null;
     dragNodeID = null;

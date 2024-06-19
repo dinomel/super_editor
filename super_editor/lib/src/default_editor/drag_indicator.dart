@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:attributed_text/attributed_text.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -16,12 +14,15 @@ import 'layout_single_column/layout_single_column.dart';
 class DragIndicatorNode extends BlockNode with ChangeNotifier {
   DragIndicatorNode({
     required this.id,
+    required this.color,
   }) {
     putMetadataValue("blockType", const NamedAttribution('dragIndicator'));
   }
 
   @override
   final String id;
+
+  final Color color;
 
   @override
   String? copyContent(dynamic selection) {
@@ -56,13 +57,16 @@ class DragIndicatorComponentBuilder implements ComponentBuilder {
 
   @override
   SingleColumnLayoutComponentViewModel? createViewModel(
-      Document document, DocumentNode node) {
+    Document document,
+    DocumentNode node,
+  ) {
     if (node is! DragIndicatorNode) {
       return null;
     }
 
     return DragIndicatorComponentViewModel(
       nodeId: node.id,
+      color: node.color,
       selectionColor: const Color(0x00000000),
       caretColor: const Color(0x00000000),
     );
@@ -77,6 +81,7 @@ class DragIndicatorComponentBuilder implements ComponentBuilder {
 
     return DragIndicatorComponent(
       nodeId: componentViewModel.nodeId,
+      color: componentViewModel.color,
       componentKey: componentContext.componentKey,
       selection: componentViewModel.selection?.nodeSelection
           as UpstreamDownstreamNodeSelection?,
@@ -97,6 +102,7 @@ class DragIndicatorComponentViewModel
     DocumentNodeSelection? selection,
     Color selectionColor = Colors.transparent,
     this.caret,
+    required this.color,
     required this.caretColor,
   }) {
     super.selection = selection;
@@ -105,10 +111,12 @@ class DragIndicatorComponentViewModel
 
   UpstreamDownstreamNodePosition? caret;
   Color caretColor;
+  Color color;
 
   @override
   DragIndicatorComponentViewModel copy() {
     return DragIndicatorComponentViewModel(
+      color: color,
       nodeId: nodeId,
       maxWidth: maxWidth,
       padding: padding,
@@ -147,8 +155,8 @@ class DragIndicatorComponent extends StatelessWidget {
     Key? key,
     required this.componentKey,
     required this.nodeId,
-    this.color = Colors.grey,
-    this.thickness = 1,
+    required this.color,
+    this.thickness = 2,
     this.selectionColor = Colors.blue,
     this.selection,
     required this.caretColor,
@@ -169,7 +177,6 @@ class DragIndicatorComponent extends StatelessWidget {
     return Selector<EditorNotifier, bool>(
       selector: (_, notifier) => notifier.isDragNodeVisible(nodeId),
       builder: (_, isDragNodeVisible, __) {
-        log('nodeID: $nodeId, isDragNodeVisible: $isDragNodeVisible');
         return IgnorePointer(
           child: SelectableBox(
             selection: selection,

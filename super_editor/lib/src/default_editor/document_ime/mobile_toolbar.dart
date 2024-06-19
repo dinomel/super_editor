@@ -30,7 +30,7 @@ class KeyboardEditingToolbar extends StatefulWidget {
     required this.document,
     required this.composer,
     required this.commonOps,
-    this.shouldAddKeyboradPadding = false,
+    this.shouldAddKeyboardPadding = false,
     this.brightness,
     this.takeUpSameSpaceAsToolbar = false,
   }) : super(key: key);
@@ -40,7 +40,7 @@ class KeyboardEditingToolbar extends StatefulWidget {
   final DocumentComposer composer;
   final CommonEditorOperations commonOps;
 
-  final bool shouldAddKeyboradPadding;
+  final bool shouldAddKeyboardPadding;
 
   @Deprecated(
       "To change the brightness, wrap KeyboardEditingToolbar with a Theme, instead")
@@ -143,7 +143,7 @@ class _KeyboardEditingToolbarState extends State<KeyboardEditingToolbar>
         // Add padding that takes up the height of the software keyboard so
         // that the toolbar sits just above the keyboard.
         padding: EdgeInsets.only(
-          bottom: widget.shouldAddKeyboradPadding ? keyboardHeight : 0,
+          bottom: widget.shouldAddKeyboardPadding ? keyboardHeight : 0,
         ),
         child: Align(
           alignment: Alignment.bottomLeft,

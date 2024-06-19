@@ -43,7 +43,8 @@ class Stylesheet {
     return Stylesheet(
       documentPadding: documentPadding ?? this.documentPadding,
       inlineTextStyler: inlineTextStyler ?? this.inlineTextStyler,
-      selectedTextColorStrategy: selectedTextColorStrategy ?? this.selectedTextColorStrategy,
+      selectedTextColorStrategy:
+          selectedTextColorStrategy ?? this.selectedTextColorStrategy,
       rules: [
         ...addRulesBefore,
         ...(rules ?? this.rules),
@@ -70,7 +71,8 @@ typedef SelectedTextColorStrategy = Color Function({
 });
 
 /// Adjusts the given [existingStyle] based on the given [attributions].
-typedef AttributionStyleAdjuster = TextStyle Function(Set<Attribution> attributions, TextStyle existingStyle);
+typedef AttributionStyleAdjuster = TextStyle Function(
+    Set<Attribution> attributions, TextStyle existingStyle);
 
 /// A single style rule within a [Stylesheet].
 ///
@@ -100,8 +102,15 @@ typedef Styler = Map<String, dynamic> Function(Document, DocumentNode);
 class BlockSelector {
   static const all = BlockSelector._();
 
+  BlockSelector.allWithout(this._excludeBlockType)
+      : _blockType = null,
+        _precedingBlockType = null,
+        _followingBlockType = null,
+        _indexMatcher = null;
+
   const BlockSelector(this._blockType)
-      : _precedingBlockType = null,
+      : _excludeBlockType = null,
+        _precedingBlockType = null,
         _followingBlockType = null,
         _indexMatcher = null;
 
@@ -110,13 +119,16 @@ class BlockSelector {
     String? precedingBlockType,
     String? followingBlockType,
     _BlockMatcher? indexMatcher,
-  })  : _blockType = blockType,
+  })  : _excludeBlockType = null,
+        _blockType = blockType,
         _precedingBlockType = precedingBlockType,
         _followingBlockType = followingBlockType,
         _indexMatcher = indexMatcher;
 
   /// The desired type of block, or `null` to match any block.
   final String? _blockType;
+
+  final String? _excludeBlockType;
 
   /// Type of block that appears immediately before the desired block.
   final String? _precedingBlockType;
@@ -166,7 +178,14 @@ class BlockSelector {
   /// Returns `true` if this selector matches the block for the given [node], or
   /// `false`, otherwise.
   bool matches(Document document, DocumentNode node) {
-    if (_blockType != null && (node.getMetadataValue("blockType") as NamedAttribution?)?.name != _blockType) {
+    if (_excludeBlockType != null &&
+        (node.getMetadataValue("blockType") as NamedAttribution?)?.name ==
+            _excludeBlockType) {
+      return false;
+    }
+    if (_blockType != null &&
+        (node.getMetadataValue("blockType") as NamedAttribution?)?.name !=
+            _blockType) {
       return false;
     }
 
@@ -176,12 +195,13 @@ class BlockSelector {
 
     if (_precedingBlockType != null) {
       DocumentNode? nodeBefore = document.getNodeBefore(node);
-      //TODO: Dino pogledaj
-      if(nodeBefore != null) {
+      if (nodeBefore != null) {
         nodeBefore = document.getNodeBefore(nodeBefore);
       }
       if (nodeBefore == null ||
-          (nodeBefore.getMetadataValue("blockType") as NamedAttribution?)?.name != _precedingBlockType) {
+          (nodeBefore.getMetadataValue("blockType") as NamedAttribution?)
+                  ?.name !=
+              _precedingBlockType) {
         return false;
       }
     }
@@ -189,7 +209,9 @@ class BlockSelector {
     if (_followingBlockType != null) {
       final nodeAfter = document.getNodeAfter(node);
       if (nodeAfter == null ||
-          (nodeAfter.getMetadataValue("blockType") as NamedAttribution?)?.name != _followingBlockType) {
+          (nodeAfter.getMetadataValue("blockType") as NamedAttribution?)
+                  ?.name !=
+              _followingBlockType) {
         return false;
       }
     }
@@ -269,7 +291,8 @@ class CascadingPadding {
   final double? top;
   final double? bottom;
 
-  CascadingPadding applyOnTopOf(CascadingPadding other) => CascadingPadding.only(
+  CascadingPadding applyOnTopOf(CascadingPadding other) =>
+      CascadingPadding.only(
         left: left ?? other.left,
         right: right ?? other.right,
         top: top ?? other.top,
@@ -294,7 +317,8 @@ class CascadingPadding {
           bottom == other.bottom;
 
   @override
-  int get hashCode => left.hashCode ^ right.hashCode ^ top.hashCode ^ bottom.hashCode;
+  int get hashCode =>
+      left.hashCode ^ right.hashCode ^ top.hashCode ^ bottom.hashCode;
 }
 
 /// Styles applied to the user's selection, e.g., selected text.
@@ -320,7 +344,8 @@ class SelectionStyles {
           highlightEmptyTextBlocks == other.highlightEmptyTextBlocks;
 
   @override
-  int get hashCode => selectionColor.hashCode ^ highlightEmptyTextBlocks.hashCode;
+  int get hashCode =>
+      selectionColor.hashCode ^ highlightEmptyTextBlocks.hashCode;
 }
 
 /// The keys to the style metadata used by a [StyleRule].

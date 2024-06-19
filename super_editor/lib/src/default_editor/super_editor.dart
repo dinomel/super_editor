@@ -1406,7 +1406,6 @@ final defaultStylesheet = Stylesheet(
       (doc, docNode) {
         return {
           Styles.maxWidth: 640.0,
-          Styles.padding: const CascadingPadding.symmetric(horizontal: 24),
           Styles.textStyle: const TextStyle(
             color: Colors.black,
             fontSize: 18,
@@ -1415,7 +1414,14 @@ final defaultStylesheet = Stylesheet(
         };
       },
     ),
-    //TODO: Dino ovdeee
+    StyleRule(
+      BlockSelector.allWithout('dragIndicator'),
+      (doc, docNode) {
+        return {
+          Styles.padding: const CascadingPadding.symmetric(horizontal: 24),
+        };
+      },
+    ),
     StyleRule(
       const BlockSelector("header1"),
       (doc, docNode) {

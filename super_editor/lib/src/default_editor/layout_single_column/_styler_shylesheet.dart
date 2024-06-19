@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/painting.dart';
 import 'package:super_editor/src/core/styles.dart';
 
@@ -63,6 +65,8 @@ class SingleColumnStylesheetStyler extends SingleColumnLayoutStylePhase {
         );
       }
     }
+
+    print('aggregateStyles: $aggregateStyles');
 
     viewModel.applyStyles(aggregateStyles);
 

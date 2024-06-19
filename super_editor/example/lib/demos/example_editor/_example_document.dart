@@ -1,4 +1,4 @@
-import 'package:flutter/rendering.dart';
+import 'package:flutter/material.dart';
 import 'package:super_editor/super_editor.dart';
 import 'package:super_editor/src/default_editor/drag_indicator.dart';
 
@@ -121,6 +121,15 @@ MutableDocument createInitialDocument() {
         'Use AttributedText to quickly and easily apply metadata spans to a string.',
       ),
     ),
+    ImageNode(
+      id: Editor.createNodeId(),
+      imageUrl: 'https://i.ibb.co/5nvRdx1/flutter-horizon.png',
+      expectedBitmapSize: ExpectedSize(1911, 630),
+      metadata: const SingleColumnLayoutComponentStyles(
+        width: double.infinity,
+        padding: EdgeInsets.zero,
+      ).toMetadata(),
+    ),
     ParagraphNode(
       id: Editor.createNodeId(),
       text: AttributedText(
@@ -132,7 +141,12 @@ MutableDocument createInitialDocument() {
   int nl = nodes.length;
 
   for (int i = 0; i <= nl; i++) {
-    nodes.insert(i * 2, DragIndicatorNode(id: Editor.createNodeId()));
+    nodes.insert(
+        i * 2,
+        DragIndicatorNode(
+          id: Editor.createNodeId(),
+          color: Colors.green,
+        ));
   }
 
   return MutableDocument(nodes: nodes);
