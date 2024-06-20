@@ -2428,6 +2428,7 @@ class DeleteUpstreamCharacterRequest implements EditRequest {
   const DeleteUpstreamCharacterRequest();
 }
 
+//TODO: Dino ovo mora biti to!! Izgleda da nije..
 class DeleteUpstreamCharacterCommand implements EditCommand {
   const DeleteUpstreamCharacterCommand();
 

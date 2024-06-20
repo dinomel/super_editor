@@ -45,11 +45,15 @@ abstract class Document {
   /// [Document].
   DocumentNode? getNodeBefore(DocumentNode node);
 
+  DocumentNode? getDragIndicatorNodeBefore(DocumentNode node);
+
   /// Returns the [DocumentNode] that appears immediately after the
   /// given [node] in this [Document], or null if the given [node]
   /// is the last node, or the given [node] does not exist in this
   /// [Document].
   DocumentNode? getNodeAfter(DocumentNode node);
+
+  DocumentNode? getDragIndicatorNodeAfter(DocumentNode node);
 
   /// Returns the [DocumentNode] at the given [position], or [null] if
   /// no such node exists in this [Document].

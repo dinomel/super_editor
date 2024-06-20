@@ -583,14 +583,36 @@ class MutableDocument implements Document, Editable {
     return _nodeIndicesById[nodeId] ?? -1;
   }
 
+  /// TODO: Dino should make it foolproof.
   @override
   DocumentNode? getNodeBefore(DocumentNode node) {
+    if (node is DragIndicatorNode) {
+      return getDragIndicatorNodeBefore(node);
+    }
+    final nodeIndex = getNodeIndexById(node.id);
+
+    if (nodeIndex <= 2) return null;
+
+    return getNodeAt(nodeIndex - 2);
+  }
+
+  @override
+  DocumentNode? getDragIndicatorNodeBefore(DocumentNode node) {
     final nodeIndex = getNodeIndexById(node.id);
     return nodeIndex > 0 ? getNodeAt(nodeIndex - 1) : null;
   }
 
+  /// TODO: Dino should make it foolproof.
   @override
   DocumentNode? getNodeAfter(DocumentNode node) {
+    final nodeIndex = getNodeIndexById(node.id);
+    return nodeIndex >= 0 && nodeIndex < _nodes.length - 2
+        ? getNodeAt(nodeIndex + 2)
+        : null;
+  }
+
+  @override
+  DocumentNode? getDragIndicatorNodeAfter(DocumentNode node) {
     final nodeIndex = getNodeIndexById(node.id);
     return nodeIndex >= 0 && nodeIndex < _nodes.length - 1
         ? getNodeAt(nodeIndex + 1)
@@ -700,8 +722,8 @@ class MutableDocument implements Document, Editable {
     print('MutableDocument: deleteNodeAt index: $index');
     // if (index.isEven) return;
     if (index >= 0 && index < _nodes.length) {
-      _nodes.removeAt(index - 1);
-      _nodes.removeAt(index - 1);
+      _nodes.removeAt(index + 1);
+      _nodes.removeAt(index);
       _refreshNodeIdCaches();
     } else {
       editorDocLog.warning('Could not delete node. Index out of range: $index');
@@ -713,10 +735,13 @@ class MutableDocument implements Document, Editable {
     print('MutableDocument: deleteNode node: ${node.metadata}');
     bool isRemoved = false;
 
-    final dragNode = getNodeBefore(node);
+    final dragNode = getDragIndicatorNodeAfter(node);
     print('MutableDocument: dragNode: ${dragNode?.metadata}');
+    if (dragNode is DragIndicatorNode) {
+      _nodes.remove(dragNode);
+    }
+    _nodes.remove(dragNode);
     isRemoved = _nodes.remove(node);
-    // _nodes.remove(dragNode);
     if (isRemoved) {
       _refreshNodeIdCaches();
     }

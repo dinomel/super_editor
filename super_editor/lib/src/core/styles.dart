@@ -195,9 +195,6 @@ class BlockSelector {
 
     if (_precedingBlockType != null) {
       DocumentNode? nodeBefore = document.getNodeBefore(node);
-      if (nodeBefore != null) {
-        nodeBefore = document.getNodeBefore(nodeBefore);
-      }
       if (nodeBefore == null ||
           (nodeBefore.getMetadataValue("blockType") as NamedAttribution?)
                   ?.name !=

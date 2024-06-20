@@ -66,8 +66,6 @@ class SingleColumnStylesheetStyler extends SingleColumnLayoutStylePhase {
       }
     }
 
-    print('aggregateStyles: $aggregateStyles');
-
     viewModel.applyStyles(aggregateStyles);
 
     return viewModel;

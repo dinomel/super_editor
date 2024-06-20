@@ -103,6 +103,7 @@ MutableDocument createInitialDocument() {
         "Implement your own document data store by implementing the Document api.",
       ),
     ),
+    HorizontalRuleNode(id: Editor.createNodeId()),
     ListItemNode.unordered(
       id: Editor.createNodeId(),
       text: AttributedText(

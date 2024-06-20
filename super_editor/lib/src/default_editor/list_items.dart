@@ -1240,10 +1240,8 @@ int computeListItemOrdinalValue(ListItemNode listItem, Document document) {
   }
 
   int ordinalValue = 1;
-  DocumentNode? dragNodeAbove = document.getNodeBefore(listItem);
-  if (dragNodeAbove == null) return ordinalValue;
 
-  DocumentNode? nodeAbove = document.getNodeBefore(dragNodeAbove);
+  DocumentNode? nodeAbove = document.getNodeBefore(listItem);
   while (nodeAbove != null &&
       nodeAbove is ListItemNode &&
       nodeAbove.indent >= listItem.indent) {
@@ -1255,9 +1253,7 @@ int computeListItemOrdinalValue(ListItemNode listItem, Document document) {
       }
       ordinalValue = ordinalValue + 1;
     }
-    dragNodeAbove = document.getNodeBefore(nodeAbove);
-    nodeAbove =
-        dragNodeAbove == null ? null : document.getNodeBefore(dragNodeAbove);
+    nodeAbove = document.getNodeBefore(nodeAbove);
   }
 
   return ordinalValue;
