@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
@@ -8,20 +9,32 @@ class EditorNotifier extends ChangeNotifier {
   ScrollController scrollController = ScrollController();
   int? dragIndex;
   String? dragNodeID;
+  double? dragPositionDeltaY;
+  Timer? dragAutoscrollTimer;
+  double? screenHeight;
+  final autoscrollCoefficient = 8;
+
+  bool isDragNodeVisible(String nodeId) => dragNodeID == nodeId;
 
   EditorNotifier({required this.doc});
 
   @override
   void dispose() {
     scrollController.dispose();
+    dragAutoscrollTimer?.cancel();
     super.dispose();
   }
 
-  void onDragUpdate(
-    DragUpdateDetails details,
-    int Function(double) findComponentIndexAtOffset,
-    String nodeId,
-  ) {
+  void onDragUpdate({
+    required BuildContext context,
+    required DragUpdateDetails details,
+    required int Function(double) findComponentIndexAtOffset,
+    required String nodeId,
+  }) {
+    screenHeight = MediaQuery.of(context).size.height -
+        MediaQuery.of(Scaffold.of(context).context).viewInsets.bottom;
+    _setAutoscrollTimer();
+    dragPositionDeltaY = details.globalPosition.dy;
     final nodeIndex = doc.getNodeIndexById(nodeId);
     final newIndex = findComponentIndexAtOffset(
       details.globalPosition.dy + scrollController.offset,
@@ -59,8 +72,74 @@ class EditorNotifier extends ChangeNotifier {
     );
     dragIndex = null;
     dragNodeID = null;
+    dragPositionDeltaY = null;
+    dragAutoscrollTimer?.cancel();
+    dragAutoscrollTimer = null;
+    screenHeight = null;
     notifyListeners();
   }
 
-  bool isDragNodeVisible(String nodeId) => dragNodeID == nodeId;
+  void onDragCompleted() {
+    dragIndex = null;
+    dragNodeID = null;
+    dragPositionDeltaY = null;
+    dragAutoscrollTimer?.cancel();
+    dragAutoscrollTimer = null;
+    screenHeight = null;
+    notifyListeners();
+  }
+
+  void onDraggableCanceled(Velocity velocity, Offset offset) {
+    dragIndex = null;
+    dragNodeID = null;
+    dragPositionDeltaY = null;
+    dragAutoscrollTimer?.cancel();
+    dragAutoscrollTimer = null;
+    screenHeight = null;
+    notifyListeners();
+  }
+
+  void _setAutoscrollTimer() {
+    if (dragAutoscrollTimer != null) return;
+    dragAutoscrollTimer = Timer.periodic(
+      const Duration(milliseconds: 10),
+      (_) => _autoScroll(),
+    );
+  }
+
+  void _autoScroll() {
+    log('dragPositionDeltaY: $dragPositionDeltaY');
+    if (dragPositionDeltaY == null || screenHeight == null) return;
+
+    if (dragPositionDeltaY! < 100 && scrollController.position.pixels > 0) {
+      log('_autoScrollUp accepted');
+      scrollController.jumpTo(
+        scrollController.position.pixels -
+            autoscrollCoefficient * (1 - dragPositionDeltaY! / 100),
+      );
+    } else if (dragPositionDeltaY! > screenHeight! - 100 &&
+        scrollController.position.pixels <
+            scrollController.position.maxScrollExtent) {
+      log('_autoScrollDown accepted');
+      scrollController.jumpTo(
+        // x je dragPositionDeltaY
+        // y = ax + b
+        // 0 = a*(screenHeight! - 100) + b
+        // 1 = a*(screenHeight!) + b
+        // 1 = a*(screenHeight!) - a*(screenHeight! - 100)
+        // 1 = 100*a
+        // a = 1/100
+        // y = 1/100 * x + b
+        // 1 = 1/100 * screenHeight! + b
+        // b = 1 - 1/100 * screenHeight!
+        // y = 1/100 * x + 1 - 1/100 * screenHeight!
+
+        // 0 ako je dragPositionDeltaY == screenHeight! - 100
+        // 1 ako je dragPositionDeltaY == screenHeight!
+        scrollController.position.pixels +
+            autoscrollCoefficient *
+                (1 - (screenHeight! - dragPositionDeltaY!) / 100),
+      );
+    }
+  }
 }

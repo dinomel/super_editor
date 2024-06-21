@@ -1089,11 +1089,14 @@ class _Component extends StatelessWidget {
           hitTestBehavior: HitTestBehavior.translucent,
           onDragUpdate: (details) {
             notifier.onDragUpdate(
-              details,
-              findClosestDragIndexAtOffset,
-              componentViewModel.nodeId,
+              context: context,
+              details: details,
+              findComponentIndexAtOffset: findClosestDragIndexAtOffset,
+              nodeId: componentViewModel.nodeId,
             );
           },
+          onDraggableCanceled: notifier.onDraggableCanceled,
+          onDragCompleted: notifier.onDragCompleted,
           onDragEnd: (_) => notifier.onDragEnd(componentViewModel.nodeId),
           feedback: Material(
             color: Colors.transparent,
