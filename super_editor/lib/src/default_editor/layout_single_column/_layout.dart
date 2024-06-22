@@ -885,7 +885,7 @@ class _SingleColumnDocumentLayoutState extends State<SingleColumnDocumentLayout>
       0,
       _topToBottomComponentKeys.length - 1,
     );
-    if (componentIndex.isEven) return componentIndex;
+    if (componentIndex < 0 || componentIndex.isEven) return componentIndex;
     final prevBound = _getComponentBoundsByIndex(componentIndex - 1);
     final nextBound = _getComponentBoundsByIndex(componentIndex + 1);
     if (dy - prevBound.top > nextBound.top - dy) {

@@ -108,11 +108,9 @@ class EditorNotifier extends ChangeNotifier {
   }
 
   void _autoScroll() {
-    log('dragPositionDeltaY: $dragPositionDeltaY');
     if (dragPositionDeltaY == null || screenHeight == null) return;
 
     if (dragPositionDeltaY! < 100 && scrollController.position.pixels > 0) {
-      log('_autoScrollUp accepted');
       scrollController.jumpTo(
         scrollController.position.pixels -
             autoscrollCoefficient * (1 - dragPositionDeltaY! / 100),
@@ -120,7 +118,6 @@ class EditorNotifier extends ChangeNotifier {
     } else if (dragPositionDeltaY! > screenHeight! - 100 &&
         scrollController.position.pixels <
             scrollController.position.maxScrollExtent) {
-      log('_autoScrollDown accepted');
       scrollController.jumpTo(
         // x je dragPositionDeltaY
         // y = ax + b

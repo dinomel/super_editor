@@ -646,7 +646,6 @@ class MutableDocument implements Document, Editable {
 
   /// Inserts the given [node] into the [Document] at the given [index].
   void insertNodeAt(int index, DocumentNode node) {
-    print('MutableDocument: insertNodeAt index: $index');
     if (index <= _nodes.length) {
       _nodes.insert(index, node);
       _nodes.insert(
@@ -665,8 +664,6 @@ class MutableDocument implements Document, Editable {
     required DocumentNode existingNode,
     required DocumentNode newNode,
   }) {
-    print(
-        'MutableDocument: insertNodeBefore existingNode: ${existingNode.metadata} newNode: ${newNode.metadata}');
     final nodeIndex = _nodes.indexOf(existingNode);
     _nodes.insert(nodeIndex, newNode);
     _nodes.insert(
@@ -684,8 +681,6 @@ class MutableDocument implements Document, Editable {
     required DocumentNode existingNode,
     required DocumentNode newNode,
   }) {
-    print(
-        'MutableDocument: insertNodeAfter existingNode: ${existingNode.metadata} newNode: ${newNode.metadata}');
     final nodeIndex = _nodes.indexOf(existingNode);
     if (nodeIndex >= 0 && nodeIndex < _nodes.length) {
       _nodes.insert(nodeIndex + 1, newNode);
@@ -702,7 +697,6 @@ class MutableDocument implements Document, Editable {
 
   /// Adds [node] to the end of the document.
   void add(DocumentNode node) {
-    print('MutableDocument: add node: ${node.metadata}');
     _nodes.insert(_nodes.length, node);
 
     _nodes.insert(
@@ -719,8 +713,6 @@ class MutableDocument implements Document, Editable {
 
   /// Deletes the node at the given [index].
   void deleteNodeAt(int index) {
-    print('MutableDocument: deleteNodeAt index: $index');
-    // if (index.isEven) return;
     if (index >= 0 && index < _nodes.length) {
       _nodes.removeAt(index + 1);
       _nodes.removeAt(index);
@@ -732,11 +724,9 @@ class MutableDocument implements Document, Editable {
 
   /// Deletes the given [node] from the [Document].
   bool deleteNode(DocumentNode node) {
-    print('MutableDocument: deleteNode node: ${node.metadata}');
     bool isRemoved = false;
 
     final dragNode = getDragIndicatorNodeAfter(node);
-    print('MutableDocument: dragNode: ${dragNode?.metadata}');
     if (dragNode is DragIndicatorNode) {
       _nodes.remove(dragNode);
     }
@@ -754,8 +744,6 @@ class MutableDocument implements Document, Editable {
   ///
   /// If none of the nodes in this document match [nodeId], throws an error.
   void moveNode({required String nodeId, required int targetIndex}) {
-    print(
-        'MutableDocument: moveNode nodeId: $nodeId, targetIndex: $targetIndex');
     final node = getNodeById(nodeId);
     if (node == null) {
       throw Exception('Could not find node with nodeId: $nodeId');
@@ -772,8 +760,6 @@ class MutableDocument implements Document, Editable {
     required DocumentNode oldNode,
     required DocumentNode newNode,
   }) {
-    print(
-        'MutableDocument: replaceNode oldNode: ${oldNode.metadata} newNode: ${newNode.metadata}');
     final index = _nodes.indexOf(oldNode);
 
     if (index != -1) {
