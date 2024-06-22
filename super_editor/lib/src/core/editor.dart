@@ -652,7 +652,7 @@ class MutableDocument implements Document, Editable {
         index,
         DragIndicatorNode(
           id: Editor.createNodeId(),
-          color: Colors.green,
+          color: (_nodes.first as DragIndicatorNode).color,
         ),
       );
       _refreshNodeIdCaches();
@@ -670,7 +670,7 @@ class MutableDocument implements Document, Editable {
       nodeIndex,
       DragIndicatorNode(
         id: Editor.createNodeId(),
-        color: Colors.green,
+        color: (_nodes.first as DragIndicatorNode).color,
       ),
     );
     _refreshNodeIdCaches();
@@ -688,7 +688,7 @@ class MutableDocument implements Document, Editable {
         nodeIndex + 1,
         DragIndicatorNode(
           id: Editor.createNodeId(),
-          color: Colors.green,
+          color: (_nodes.first as DragIndicatorNode).color,
         ),
       );
       _refreshNodeIdCaches();
@@ -703,7 +703,7 @@ class MutableDocument implements Document, Editable {
       _nodes.length,
       DragIndicatorNode(
         id: Editor.createNodeId(),
-        color: Colors.green,
+        color: (_nodes.first as DragIndicatorNode).color,
       ),
     );
 
