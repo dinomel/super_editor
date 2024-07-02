@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:attributed_text/attributed_text.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/cupertino.dart';
@@ -1516,6 +1518,12 @@ class CommittedStableTagAttribution implements Attribution {
   String get id => tagValue;
 
   final String tagValue;
+
+  @override
+  String toJson() => jsonEncode({
+    'id': id,
+    'tagValue': tagValue,
+  });
 
   @override
   bool canMergeWith(Attribution other) {

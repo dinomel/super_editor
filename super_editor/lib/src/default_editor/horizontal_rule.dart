@@ -22,7 +22,8 @@ class HorizontalRuleNode extends BlockNode with ChangeNotifier {
   @override
   String? copyContent(dynamic selection) {
     if (selection is! UpstreamDownstreamNodeSelection) {
-      throw Exception('HorizontalRuleNode can only copy content from a UpstreamDownstreamNodeSelection.');
+      throw Exception(
+          'HorizontalRuleNode can only copy content from a UpstreamDownstreamNodeSelection.');
     }
 
     return !selection.isCollapsed ? '---' : null;
@@ -35,7 +36,10 @@ class HorizontalRuleNode extends BlockNode with ChangeNotifier {
 
   @override
   bool operator ==(Object other) =>
-      identical(this, other) || other is HorizontalRuleNode && runtimeType == other.runtimeType && id == other.id;
+      identical(this, other) ||
+      other is HorizontalRuleNode &&
+          runtimeType == other.runtimeType &&
+          id == other.id;
 
   @override
   int get hashCode => id.hashCode;
@@ -45,7 +49,8 @@ class HorizontalRuleComponentBuilder implements ComponentBuilder {
   const HorizontalRuleComponentBuilder();
 
   @override
-  SingleColumnLayoutComponentViewModel? createViewModel(Document document, DocumentNode node) {
+  SingleColumnLayoutComponentViewModel? createViewModel(
+      Document document, DocumentNode node) {
     if (node is! HorizontalRuleNode) {
       return null;
     }
@@ -58,15 +63,16 @@ class HorizontalRuleComponentBuilder implements ComponentBuilder {
   }
 
   @override
-  Widget? createComponent(
-      SingleColumnDocumentComponentContext componentContext, SingleColumnLayoutComponentViewModel componentViewModel) {
+  Widget? createComponent(SingleColumnDocumentComponentContext componentContext,
+      SingleColumnLayoutComponentViewModel componentViewModel) {
     if (componentViewModel is! HorizontalRuleComponentViewModel) {
       return null;
     }
 
     return HorizontalRuleComponent(
       componentKey: componentContext.componentKey,
-      selection: componentViewModel.selection?.nodeSelection as UpstreamDownstreamNodeSelection?,
+      selection: componentViewModel.selection?.nodeSelection
+          as UpstreamDownstreamNodeSelection?,
       selectionColor: componentViewModel.selectionColor,
       showCaret: componentViewModel.caret != null,
       caretColor: componentViewModel.caretColor,
@@ -74,7 +80,9 @@ class HorizontalRuleComponentBuilder implements ComponentBuilder {
   }
 }
 
-class HorizontalRuleComponentViewModel extends SingleColumnLayoutComponentViewModel with SelectionAwareViewModelMixin {
+class HorizontalRuleComponentViewModel
+    extends SingleColumnLayoutComponentViewModel
+    with SelectionAwareViewModelMixin {
   HorizontalRuleComponentViewModel({
     required super.nodeId,
     super.maxWidth,
@@ -107,14 +115,14 @@ class HorizontalRuleComponentViewModel extends SingleColumnLayoutComponentViewMo
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-          super == other &&
-              other is HorizontalRuleComponentViewModel &&
-              runtimeType == other.runtimeType &&
-              nodeId == other.nodeId &&
-              selection == other.selection &&
-              selectionColor == other.selectionColor &&
-              caret == other.caret &&
-              caretColor == other.caretColor;
+      super == other &&
+          other is HorizontalRuleComponentViewModel &&
+          runtimeType == other.runtimeType &&
+          nodeId == other.nodeId &&
+          selection == other.selection &&
+          selectionColor == other.selectionColor &&
+          caret == other.caret &&
+          caretColor == other.caretColor;
 
   @override
   int get hashCode =>

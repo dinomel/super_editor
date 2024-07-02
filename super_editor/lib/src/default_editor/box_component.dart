@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:super_editor/src/core/document.dart';
 import 'package:super_editor/src/core/document_composer.dart';
@@ -72,6 +74,12 @@ abstract class BlockNode extends DocumentNode {
 
     return UpstreamDownstreamNodeSelection(base: base, extent: extent);
   }
+
+  @override
+  String toJson() => jsonEncode({
+    'blockType': metadata['blockType'],
+    'id': id,
+  });
 }
 
 /// Editor layout component that displays content that is either

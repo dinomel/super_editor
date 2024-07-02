@@ -1,6 +1,8 @@
+import 'dart:convert';
 import 'dart:ui';
 
 import 'package:attributed_text/attributed_text.dart';
+import 'package:super_editor/src/default_editor/color_extension.dart';
 
 /// Header 1 style block attribution.
 const header1Attribution = NamedAttribution('header1');
@@ -56,13 +58,22 @@ class ColorAttribution implements Attribution {
   final Color color;
 
   @override
+  String toJson() => jsonEncode({
+        'id': id,
+        'color': color.toHexString,
+      });
+
+  @override
   bool canMergeWith(Attribution other) {
     return this == other;
   }
 
   @override
   bool operator ==(Object other) =>
-      identical(this, other) || other is ColorAttribution && runtimeType == other.runtimeType && color == other.color;
+      identical(this, other) ||
+      other is ColorAttribution &&
+          runtimeType == other.runtimeType &&
+          color == other.color;
 
   @override
   int get hashCode => color.hashCode;
@@ -88,6 +99,12 @@ class BackgroundColorAttribution implements Attribution {
   final Color color;
 
   @override
+  String toJson() => jsonEncode({
+        'id': id,
+        'color': color.toHexString,
+      });
+
+  @override
   bool canMergeWith(Attribution other) {
     return this == other;
   }
@@ -95,7 +112,9 @@ class BackgroundColorAttribution implements Attribution {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is BackgroundColorAttribution && runtimeType == other.runtimeType && color == other.color;
+      other is BackgroundColorAttribution &&
+          runtimeType == other.runtimeType &&
+          color == other.color;
 
   @override
   int get hashCode => color.hashCode;
@@ -121,6 +140,12 @@ class FontSizeAttribution implements Attribution {
   final double fontSize;
 
   @override
+  String toJson() => jsonEncode({
+        'id': id,
+        'fontSize': fontSize,
+      });
+
+  @override
   bool canMergeWith(Attribution other) {
     return this == other;
   }
@@ -128,7 +153,9 @@ class FontSizeAttribution implements Attribution {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is FontSizeAttribution && runtimeType == other.runtimeType && fontSize == other.fontSize;
+      other is FontSizeAttribution &&
+          runtimeType == other.runtimeType &&
+          fontSize == other.fontSize;
 
   @override
   int get hashCode => fontSize.hashCode;
@@ -176,13 +203,22 @@ class LinkAttribution implements Attribution {
   Uri get uri => Uri.parse(url);
 
   @override
+  String toJson() => jsonEncode({
+        'id': id,
+        'url': url,
+      });
+
+  @override
   bool canMergeWith(Attribution other) {
     return this == other;
   }
 
   @override
   bool operator ==(Object other) =>
-      identical(this, other) || other is LinkAttribution && runtimeType == other.runtimeType && url == other.url;
+      identical(this, other) ||
+      other is LinkAttribution &&
+          runtimeType == other.runtimeType &&
+          url == other.url;
 
   @override
   int get hashCode => url.hashCode;

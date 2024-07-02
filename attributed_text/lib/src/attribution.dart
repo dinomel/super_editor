@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 /// An attribution that can be associated with a span within
 /// an [AttributedSpan].
 ///
@@ -21,6 +23,8 @@ abstract class Attribution {
   /// the [other] [Attribution], replacing both smaller attributions
   /// with one larger attribution.
   bool canMergeWith(Attribution other);
+
+  String toJson();
 }
 
 /// [Attribution] that is defined by a given [String].
@@ -36,6 +40,12 @@ class NamedAttribution implements Attribution {
   String get name => id;
 
   @override
+  String toJson() => jsonEncode({
+        'id': id,
+        'name': name,
+      });
+
+  @override
   bool canMergeWith(Attribution other) {
     return this == other;
   }
@@ -47,7 +57,10 @@ class NamedAttribution implements Attribution {
 
   @override
   bool operator ==(Object other) =>
-      identical(this, other) || other is NamedAttribution && runtimeType == other.runtimeType && id == other.id;
+      identical(this, other) ||
+      other is NamedAttribution &&
+          runtimeType == other.runtimeType &&
+          id == other.id;
 
   @override
   int get hashCode => id.hashCode;

@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:attributed_text/attributed_text.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -50,6 +52,12 @@ class DragIndicatorNode extends BlockNode with ChangeNotifier {
 
   @override
   int get hashCode => id.hashCode;
+
+  @override
+  String toJson() => jsonEncode({
+        'blockType': metadata['blockType'],
+        'id': id,
+      });
 }
 
 class DragIndicatorComponentBuilder implements ComponentBuilder {

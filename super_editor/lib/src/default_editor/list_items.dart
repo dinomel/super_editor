@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:developer';
 
 import 'package:attributed_text/attributed_text.dart';
@@ -80,6 +81,15 @@ class ListItemNode extends TextNode {
       notifyListeners();
     }
   }
+
+  @override
+  String toJson() => jsonEncode({
+        'blockType': metadata['blockType'],
+        'id': id,
+        'text': text.spans.toJson(),
+        'type': type.name,
+        'indent': _indent,
+      });
 
   @override
   bool hasEquivalentContent(DocumentNode other) {

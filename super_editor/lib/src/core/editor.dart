@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:math';
 
 import 'package:attributed_text/attributed_text.dart';
@@ -536,6 +537,8 @@ class MutableDocument implements Document, Editable {
   }
 
   final List<DocumentNode> _nodes;
+
+  String toJson() => jsonEncode(_nodes.map((e) => e.toJson()));
 
   @override
   List<DocumentNode> get nodes => UnmodifiableListView(_nodes);

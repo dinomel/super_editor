@@ -1,6 +1,7 @@
 // ignore_for_file: avoid_renaming_method_parameters
 
 import 'dart:collection';
+import 'dart:convert';
 import 'dart:developer' as dev;
 import 'dart:math';
 
@@ -47,6 +48,13 @@ class TextNode extends DocumentNode with ChangeNotifier {
     _text.removeListener(notifyListeners);
     super.dispose();
   }
+
+  @override
+  String toJson() => jsonEncode({
+    'blockType': metadata['blockType'],
+    'id': id,
+    'text': _text.spans.toJson(),
+  });
 
   @override
   final String id;
