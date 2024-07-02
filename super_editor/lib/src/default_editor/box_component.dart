@@ -19,13 +19,16 @@ final _log = Logger(scope: 'box_component.dart');
 /// Base implementation for a [DocumentNode] that only supports [UpstreamDownstreamNodeSelection]s.
 abstract class BlockNode extends DocumentNode {
   @override
-  UpstreamDownstreamNodePosition get beginningPosition => const UpstreamDownstreamNodePosition.upstream();
+  UpstreamDownstreamNodePosition get beginningPosition =>
+      const UpstreamDownstreamNodePosition.upstream();
 
   @override
-  UpstreamDownstreamNodePosition get endPosition => const UpstreamDownstreamNodePosition.downstream();
+  UpstreamDownstreamNodePosition get endPosition =>
+      const UpstreamDownstreamNodePosition.downstream();
 
   @override
-  UpstreamDownstreamNodePosition selectUpstreamPosition(NodePosition position1, NodePosition position2) {
+  UpstreamDownstreamNodePosition selectUpstreamPosition(
+      NodePosition position1, NodePosition position2) {
     if (position1 is! UpstreamDownstreamNodePosition) {
       throw Exception(
           'Expected a UpstreamDownstreamNodePosition for position1 but received a ${position1.runtimeType}');
@@ -35,7 +38,8 @@ abstract class BlockNode extends DocumentNode {
           'Expected a UpstreamDownstreamNodePosition for position2 but received a ${position2.runtimeType}');
     }
 
-    if (position1.affinity == TextAffinity.upstream || position2.affinity == TextAffinity.upstream) {
+    if (position1.affinity == TextAffinity.upstream ||
+        position2.affinity == TextAffinity.upstream) {
       return const UpstreamDownstreamNodePosition.upstream();
     } else {
       return const UpstreamDownstreamNodePosition.downstream();
@@ -43,7 +47,8 @@ abstract class BlockNode extends DocumentNode {
   }
 
   @override
-  UpstreamDownstreamNodePosition selectDownstreamPosition(NodePosition position1, NodePosition position2) {
+  UpstreamDownstreamNodePosition selectDownstreamPosition(
+      NodePosition position1, NodePosition position2) {
     if (position1 is! UpstreamDownstreamNodePosition) {
       throw Exception(
           'Expected a UpstreamDownstreamNodePosition for position1 but received a ${position1.runtimeType}');
@@ -53,7 +58,8 @@ abstract class BlockNode extends DocumentNode {
           'Expected a UpstreamDownstreamNodePosition for position2 but received a ${position2.runtimeType}');
     }
 
-    if (position1.affinity == TextAffinity.downstream || position2.affinity == TextAffinity.downstream) {
+    if (position1.affinity == TextAffinity.downstream ||
+        position2.affinity == TextAffinity.downstream) {
       return const UpstreamDownstreamNodePosition.downstream();
     } else {
       return const UpstreamDownstreamNodePosition.upstream();
@@ -66,20 +72,22 @@ abstract class BlockNode extends DocumentNode {
     required NodePosition extent,
   }) {
     if (base is! UpstreamDownstreamNodePosition) {
-      throw Exception('Expected a UpstreamDownstreamNodePosition for base but received a ${base.runtimeType}');
+      throw Exception(
+          'Expected a UpstreamDownstreamNodePosition for base but received a ${base.runtimeType}');
     }
     if (extent is! UpstreamDownstreamNodePosition) {
-      throw Exception('Expected a UpstreamDownstreamNodePosition for extent but received a ${extent.runtimeType}');
+      throw Exception(
+          'Expected a UpstreamDownstreamNodePosition for extent but received a ${extent.runtimeType}');
     }
 
     return UpstreamDownstreamNodeSelection(base: base, extent: extent);
   }
 
   @override
-  String toJson() => jsonEncode({
-    'blockType': metadata['blockType'],
-    'id': id,
-  });
+  Map<String, dynamic> toJson() => {
+        'blockType': metadata['blockType'],
+        'id': id,
+      };
 }
 
 /// Editor layout component that displays content that is either
@@ -115,7 +123,8 @@ class _BoxComponentState extends State<BoxComponent> with DocumentComponent {
   }
 
   @override
-  UpstreamDownstreamNodePosition? movePositionLeft(NodePosition currentPosition, [MovementModifier? movementModifier]) {
+  UpstreamDownstreamNodePosition? movePositionLeft(NodePosition currentPosition,
+      [MovementModifier? movementModifier]) {
     if (currentPosition == const UpstreamDownstreamNodePosition.upstream()) {
       // Can't move any further left.
       return null;
@@ -125,7 +134,8 @@ class _BoxComponentState extends State<BoxComponent> with DocumentComponent {
   }
 
   @override
-  UpstreamDownstreamNodePosition? movePositionRight(NodePosition currentPosition,
+  UpstreamDownstreamNodePosition? movePositionRight(
+      NodePosition currentPosition,
       [MovementModifier? movementModifier]) {
     if (currentPosition == const UpstreamDownstreamNodePosition.downstream()) {
       // Can't move any further right.
@@ -142,7 +152,8 @@ class _BoxComponentState extends State<BoxComponent> with DocumentComponent {
   }
 
   @override
-  UpstreamDownstreamNodePosition? movePositionDown(NodePosition currentPosition) {
+  UpstreamDownstreamNodePosition? movePositionDown(
+      NodePosition currentPosition) {
     // BoxComponents don't support vertical movement.
     return null;
   }
@@ -150,7 +161,8 @@ class _BoxComponentState extends State<BoxComponent> with DocumentComponent {
   @override
   UpstreamDownstreamNodeSelection getCollapsedSelectionAt(nodePosition) {
     if (nodePosition is! UpstreamDownstreamNodePosition) {
-      throw Exception('The given nodePosition ($nodePosition) is not compatible with BoxComponent');
+      throw Exception(
+          'The given nodePosition ($nodePosition) is not compatible with BoxComponent');
     }
 
     return UpstreamDownstreamNodeSelection.collapsed(nodePosition);
@@ -178,7 +190,8 @@ class _BoxComponentState extends State<BoxComponent> with DocumentComponent {
   @override
   Offset getOffsetForPosition(NodePosition nodePosition) {
     if (nodePosition is! UpstreamDownstreamNodePosition) {
-      throw Exception('Expected nodePosition of type UpstreamDownstreamNodePosition but received: $nodePosition');
+      throw Exception(
+          'Expected nodePosition of type UpstreamDownstreamNodePosition but received: $nodePosition');
     }
 
     final myBox = context.findRenderObject() as RenderBox;
@@ -215,7 +228,8 @@ class _BoxComponentState extends State<BoxComponent> with DocumentComponent {
   @override
   Rect getRectForPosition(NodePosition nodePosition) {
     if (nodePosition is! UpstreamDownstreamNodePosition) {
-      throw Exception('Expected nodePosition of type UpstreamDownstreamNodePosition but received: $nodePosition');
+      throw Exception(
+          'Expected nodePosition of type UpstreamDownstreamNodePosition but received: $nodePosition');
     }
 
     final myBox = context.findRenderObject() as RenderBox;
@@ -224,15 +238,19 @@ class _BoxComponentState extends State<BoxComponent> with DocumentComponent {
   }
 
   @override
-  Rect getRectForSelection(NodePosition basePosition, NodePosition extentPosition) {
+  Rect getRectForSelection(
+      NodePosition basePosition, NodePosition extentPosition) {
     if (basePosition is! UpstreamDownstreamNodePosition) {
-      throw Exception('Expected nodePosition of type UpstreamDownstreamNodePosition but received: $basePosition');
+      throw Exception(
+          'Expected nodePosition of type UpstreamDownstreamNodePosition but received: $basePosition');
     }
     if (extentPosition is! UpstreamDownstreamNodePosition) {
-      throw Exception('Expected nodePosition of type UpstreamDownstreamNodePosition but received: $extentPosition');
+      throw Exception(
+          'Expected nodePosition of type UpstreamDownstreamNodePosition but received: $extentPosition');
     }
 
-    final selection = UpstreamDownstreamNodeSelection(base: basePosition, extent: extentPosition);
+    final selection = UpstreamDownstreamNodeSelection(
+        base: basePosition, extent: extentPosition);
     if (selection.isCollapsed) {
       return getRectForPosition(selection.extent);
     }
@@ -254,19 +272,24 @@ class _BoxComponentState extends State<BoxComponent> with DocumentComponent {
   }
 
   @override
-  UpstreamDownstreamNodeSelection getSelectionBetween({required basePosition, required extentPosition}) {
+  UpstreamDownstreamNodeSelection getSelectionBetween(
+      {required basePosition, required extentPosition}) {
     if (basePosition is! UpstreamDownstreamNodePosition) {
-      throw Exception('The given basePosition ($basePosition) is not compatible with BoxComponent');
+      throw Exception(
+          'The given basePosition ($basePosition) is not compatible with BoxComponent');
     }
     if (extentPosition is! UpstreamDownstreamNodePosition) {
-      throw Exception('The given extentPosition ($extentPosition) is not compatible with BoxComponent');
+      throw Exception(
+          'The given extentPosition ($extentPosition) is not compatible with BoxComponent');
     }
 
-    return UpstreamDownstreamNodeSelection(base: basePosition, extent: extentPosition);
+    return UpstreamDownstreamNodeSelection(
+        base: basePosition, extent: extentPosition);
   }
 
   @override
-  UpstreamDownstreamNodeSelection getSelectionInRange(Offset localBaseOffset, Offset localExtentOffset) {
+  UpstreamDownstreamNodeSelection getSelectionInRange(
+      Offset localBaseOffset, Offset localExtentOffset) {
     return getSelectionBetween(
       basePosition: getPositionAtOffset(localBaseOffset),
       extentPosition: getPositionAtOffset(localExtentOffset),
@@ -308,7 +331,9 @@ class SelectableBox extends StatelessWidget {
       child: IgnorePointer(
         child: DecoratedBox(
           decoration: BoxDecoration(
-            color: isSelected ? selectionColor.withOpacity(0.5) : Colors.transparent,
+            color: isSelected
+                ? selectionColor.withOpacity(0.5)
+                : Colors.transparent,
           ),
           position: DecorationPosition.foreground,
           child: child,
@@ -327,16 +352,20 @@ class DeleteUpstreamAtBeginningOfBlockNodeCommand implements EditCommand {
   void execute(EditContext context, CommandExecutor executor) {
     final document = context.find<MutableDocument>(Editor.documentKey);
     final composer = context.find<MutableDocumentComposer>(Editor.composerKey);
-    final documentLayoutEditable = context.find<DocumentLayoutEditable>(Editor.layoutKey);
+    final documentLayoutEditable =
+        context.find<DocumentLayoutEditable>(Editor.layoutKey);
 
-    final deletionPosition = DocumentPosition(nodeId: node.id, nodePosition: node.beginningPosition);
+    final deletionPosition =
+        DocumentPosition(nodeId: node.id, nodePosition: node.beginningPosition);
 
-    final nodePosition = deletionPosition.nodePosition as UpstreamDownstreamNodePosition;
+    final nodePosition =
+        deletionPosition.nodePosition as UpstreamDownstreamNodePosition;
     if (nodePosition.affinity == TextAffinity.downstream) {
       // The caret is sitting on the downstream edge of block-level content. Delete the
       // whole block by replacing it with an empty paragraph.
       executor.executeCommand(
-        ReplaceNodeWithEmptyParagraphWithCaretCommand(nodeId: deletionPosition.nodeId),
+        ReplaceNodeWithEmptyParagraphWithCaretCommand(
+            nodeId: deletionPosition.nodeId),
       );
       return;
     }
@@ -358,7 +387,8 @@ class DeleteUpstreamAtBeginningOfBlockNodeCommand implements EditCommand {
       return;
     }
 
-    final componentBefore = documentLayoutEditable.documentLayout.getComponentByNodeId(nodeBefore.id)!;
+    final componentBefore = documentLayoutEditable.documentLayout
+        .getComponentByNodeId(nodeBefore.id)!;
     if (!componentBefore.isVisualSelectionSupported()) {
       // The node/component above is not selectable. Delete it.
       executor.executeCommand(

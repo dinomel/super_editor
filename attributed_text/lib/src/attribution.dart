@@ -24,7 +24,7 @@ abstract class Attribution {
   /// with one larger attribution.
   bool canMergeWith(Attribution other);
 
-  String toJson();
+  Map<String, dynamic> toJson();
 }
 
 /// [Attribution] that is defined by a given [String].
@@ -40,10 +40,10 @@ class NamedAttribution implements Attribution {
   String get name => id;
 
   @override
-  String toJson() => jsonEncode({
+  Map<String, dynamic> toJson() => {
         'id': id,
         'name': name,
-      });
+      };
 
   @override
   bool canMergeWith(Attribution other) {

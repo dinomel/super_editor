@@ -26,12 +26,12 @@ class ImageNode extends BlockNode with ChangeNotifier {
   }
 
   @override
-  String toJson() => jsonEncode({
+  Map<String, dynamic> toJson() => {
         'blockType': metadata['blockType'],
         'id': id,
         'url': imageUrl,
         'altText': altText,
-      });
+      };
 
   @override
   final String id;

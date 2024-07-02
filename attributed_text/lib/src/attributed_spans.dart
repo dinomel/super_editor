@@ -56,8 +56,6 @@ class AttributedSpans {
     _markers.sort();
   }
 
-  String toJson() => jsonEncode(_markers.map((e) => e.toJson()));
-
   /// Returns `true` if this [AttributedSpans] contains at least one
   /// unit of attribution for each of the given [attributions]
   /// within the given range (inclusive).
@@ -1203,11 +1201,11 @@ class SpanMarker implements Comparable<SpanMarker> {
   /// Returns true if this marker is a [SpanMarkerType.end] marker.
   bool get isEnd => markerType == SpanMarkerType.end;
 
-  String toJson() => jsonEncode({
+  Map<String, dynamic> toJson() => {
         'attribution': attribution.toJson(),
         'offset': offset,
         'markerType': markerType.name,
-      });
+      };
 
   /// Returns a copy of this [SpanMarker] with optional new values
   /// for [attribution], [offset], and [markerType].

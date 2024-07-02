@@ -83,13 +83,13 @@ class ListItemNode extends TextNode {
   }
 
   @override
-  String toJson() => jsonEncode({
+  Map<String, dynamic> toJson() => {
         'blockType': metadata['blockType'],
         'id': id,
-        'text': text.spans.toJson(),
+        'text': text.spans.markers.map((e) => e.toJson()).toList(),
         'type': type.name,
         'indent': _indent,
-      });
+      };
 
   @override
   bool hasEquivalentContent(DocumentNode other) {

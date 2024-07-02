@@ -45,12 +45,12 @@ class TaskNode extends TextNode {
   }
 
   @override
-  String toJson() => jsonEncode({
+  Map<String, dynamic> toJson() => {
         'blockType': metadata['blockType'],
         'id': id,
-        'text': text.spans.toJson(),
+        'text': text.spans.markers.map((e) => e.toJson()).toList(),
         'isComplete': isComplete,
-      });
+      };
 
   @override
   bool hasEquivalentContent(DocumentNode other) {

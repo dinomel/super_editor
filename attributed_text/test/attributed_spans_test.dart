@@ -1368,10 +1368,10 @@ class _LinkAttribution implements Attribution {
   int get hashCode => url.hashCode;
 
   @override
-  String toJson() => jsonEncode({
+  Map<String, dynamic> toJson() => {
         'id': id,
         'url': url,
-      });
+      };
 }
 
 /// Creates start and end markers for the [attribution], starting at [startOffset]

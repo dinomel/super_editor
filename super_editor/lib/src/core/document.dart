@@ -391,7 +391,7 @@ abstract class DocumentNode implements ChangeNotifier {
     notifyListeners();
   }
 
-  String toJson();
+  Map<String, dynamic>  toJson();
 
   /// Returns a copy of this node's metadata.
   Map<String, dynamic> copyMetadata() => Map.from(_metadata);

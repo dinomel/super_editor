@@ -52,12 +52,6 @@ class DragIndicatorNode extends BlockNode with ChangeNotifier {
 
   @override
   int get hashCode => id.hashCode;
-
-  @override
-  String toJson() => jsonEncode({
-        'blockType': metadata['blockType'],
-        'id': id,
-      });
 }
 
 class DragIndicatorComponentBuilder implements ComponentBuilder {

@@ -58,10 +58,10 @@ class ColorAttribution implements Attribution {
   final Color color;
 
   @override
-  String toJson() => jsonEncode({
+  Map<String, dynamic> toJson() => {
         'id': id,
         'color': color.toHexString,
-      });
+      };
 
   @override
   bool canMergeWith(Attribution other) {
@@ -99,10 +99,10 @@ class BackgroundColorAttribution implements Attribution {
   final Color color;
 
   @override
-  String toJson() => jsonEncode({
+  Map<String, dynamic> toJson() => {
         'id': id,
         'color': color.toHexString,
-      });
+      };
 
   @override
   bool canMergeWith(Attribution other) {
@@ -140,10 +140,10 @@ class FontSizeAttribution implements Attribution {
   final double fontSize;
 
   @override
-  String toJson() => jsonEncode({
+  Map<String, dynamic> toJson() => {
         'id': id,
         'fontSize': fontSize,
-      });
+      };
 
   @override
   bool canMergeWith(Attribution other) {
@@ -203,10 +203,10 @@ class LinkAttribution implements Attribution {
   Uri get uri => Uri.parse(url);
 
   @override
-  String toJson() => jsonEncode({
+  Map<String, dynamic> toJson() => {
         'id': id,
         'url': url,
-      });
+      };
 
   @override
   bool canMergeWith(Attribution other) {
