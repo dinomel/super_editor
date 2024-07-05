@@ -1,8 +1,6 @@
 // ignore_for_file: avoid_renaming_method_parameters
 
 import 'dart:collection';
-import 'dart:convert';
-import 'dart:developer' as dev;
 import 'dart:math';
 
 import 'package:attributed_text/attributed_text.dart';
@@ -53,9 +51,19 @@ class TextNode extends DocumentNode with ChangeNotifier {
   Map<String, dynamic> toJson() => {
         'blockType': metadata['blockType'],
         'id': id,
-        'text': _text.text,
-        'textSpans': _text.spans.markers.map((e) => e.toJson()).toList()
+        'text': {
+          'text': _text.text,
+          'spans': _text.spans.markers.map((e) => e.toJson()).toList(),
+        },
       };
+
+  factory TextNode.fromJson(Map<String, dynamic> json) => TextNode(
+        id: json['id'],
+        text: DocumentNode.getAttributedTextFromJson(json['text']),
+        metadata: {
+          'blockType': NamedAttribution(json['blockType']['name']),
+        },
+      );
 
   @override
   final String id;

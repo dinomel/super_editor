@@ -1,5 +1,7 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/widgets.dart';
+import 'package:super_editor/super_editor.dart';
+import 'package:super_editor/src/default_editor/extensions.dart';
 
 /// A read-only document with styled text and multimedia elements.
 ///
@@ -308,6 +310,47 @@ abstract class DocumentNode implements ChangeNotifier {
   /// For example, a [ParagraphNode] would return [TextNodePosition(offset: text.length)].
   NodePosition get endPosition;
 
+  static AttributedText getAttributedTextFromJson(Map<String, dynamic> json) {
+    final spans = AttributedSpans(
+      attributions: json['spans'].map((json) {
+        Attribution attribution;
+        switch (json['attribution']['id']) {
+          case 'font_size':
+            attribution = FontSizeAttribution(json['attribution']['fontSize']);
+            break;
+          case 'background_color':
+            attribution = BackgroundColorAttribution(
+              (json['attribution']['color'] as String).colorFromHex,
+            );
+            break;
+          case 'color':
+            attribution = ColorAttribution(
+              (json['attribution']['color'] as String).colorFromHex,
+            );
+            break;
+          case 'link':
+            attribution = LinkAttribution(json['attribution']['link']);
+            break;
+          case 'patternTag':
+            attribution = const PatternTagAttribution();
+            break;
+          default:
+            attribution = NamedAttribution(json['attribution']['name']);
+        }
+        return SpanMarker(
+          attribution: attribution,
+          offset: json['offset'],
+          markerType: SpanMarkerType.values
+              .firstWhere((type) => type.name == json['markerType']),
+        );
+      }).toList(),
+    );
+    return AttributedText(
+      json['text'],
+      spans,
+    );
+  }
+
   /// Inspects [position1] and [position2] and returns the one that's
   /// positioned further upstream in this [DocumentNode].
   ///
@@ -391,7 +434,7 @@ abstract class DocumentNode implements ChangeNotifier {
     notifyListeners();
   }
 
-  Map<String, dynamic>  toJson();
+  Map<String, dynamic> toJson();
 
   /// Returns a copy of this node's metadata.
   Map<String, dynamic> copyMetadata() => Map.from(_metadata);

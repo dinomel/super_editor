@@ -43,6 +43,12 @@ class HorizontalRuleNode extends BlockNode with ChangeNotifier {
 
   @override
   int get hashCode => id.hashCode;
+
+  factory HorizontalRuleNode.fromJson(Map<String, dynamic> json) {
+    return HorizontalRuleNode(
+      id: json['id'],
+    );
+  }
 }
 
 class HorizontalRuleComponentBuilder implements ComponentBuilder {

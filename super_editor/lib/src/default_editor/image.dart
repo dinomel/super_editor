@@ -33,6 +33,14 @@ class ImageNode extends BlockNode with ChangeNotifier {
         'altText': altText,
       };
 
+  factory ImageNode.fromJson(Map<String, dynamic> json) {
+    return ImageNode(
+      id: json['id'],
+      imageUrl: json['url'],
+      altText: json['altText'],
+    );
+  }
+
   @override
   final String id;
 

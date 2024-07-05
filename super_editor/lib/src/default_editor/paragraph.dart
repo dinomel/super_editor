@@ -33,6 +33,13 @@ class ParagraphNode extends TextNode {
       putMetadataValue("blockType", paragraphAttribution);
     }
   }
+
+  factory ParagraphNode.fromJson(Map<String, dynamic> json) {
+    return ParagraphNode(
+      id: json['id'],
+      text: DocumentNode.getAttributedTextFromJson(json['text']),
+    );
+  }
 }
 
 class ParagraphComponentBuilder implements ComponentBuilder {

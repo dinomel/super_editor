@@ -124,14 +124,16 @@ class AttributedText {
   }
 
   /// Returns all spans in this [AttributedText] for the given [attributions].
-  Set<AttributionSpan> getAttributionSpans(Set<Attribution> attributions) => getAttributionSpansInRange(
+  Set<AttributionSpan> getAttributionSpans(Set<Attribution> attributions) =>
+      getAttributionSpansInRange(
         attributionFilter: (a) => attributions.contains(a),
         range: SpanRange(0, text.length),
       );
 
   /// Returns all spans in this [AttributedText], for attributions that are
   /// selected by the given [filter].
-  Set<AttributionSpan> getAttributionSpansByFilter(AttributionFilter filter) => getAttributionSpansInRange(
+  Set<AttributionSpan> getAttributionSpansByFilter(AttributionFilter filter) =>
+      getAttributionSpansInRange(
         attributionFilter: filter,
         range: SpanRange(0, text.length),
       );
@@ -192,7 +194,8 @@ class AttributedText {
   /// Removes the given [attribution] from all characters within the
   /// given [range], inclusive.
   void removeAttribution(Attribution attribution, SpanRange range) {
-    spans.removeAttribution(attributionToRemove: attribution, start: range.start, end: range.end);
+    spans.removeAttribution(
+        attributionToRemove: attribution, start: range.start, end: range.end);
     _notifyListeners();
   }
 
@@ -209,7 +212,8 @@ class AttributedText {
       attributions.addAll(spans.getAllAttributionsAt(i));
     }
     for (final attribution in attributions) {
-      spans.removeAttribution(attributionToRemove: attribution, start: range.start, end: range.end);
+      spans.removeAttribution(
+          attributionToRemove: attribution, start: range.start, end: range.end);
     }
   }
 
@@ -217,13 +221,15 @@ class AttributedText {
   /// that [attribution] is removed from the text in [range], inclusive.
   /// Otherwise, all of the text in [range], inclusive, is given the [attribution].
   void toggleAttribution(Attribution attribution, SpanRange range) {
-    spans.toggleAttribution(attribution: attribution, start: range.start, end: range.end);
+    spans.toggleAttribution(
+        attribution: attribution, start: range.start, end: range.end);
     _notifyListeners();
   }
 
   /// Copies all text and attributions from [range.start] to [range.end] (exclusive),
   /// and returns them as a new [AttributedText].
-  AttributedText copyTextInRange(SpanRange range) => copyText(range.start, range.end);
+  AttributedText copyTextInRange(SpanRange range) =>
+      copyText(range.start, range.end);
 
   /// Copies all text and attributions from [startOffset] to
   /// [endOffset], exclusive, and returns them as a new [AttributedText].
@@ -232,7 +238,8 @@ class AttributedText {
 
     // Note: -1 because copyText() uses an exclusive `start` and `end` but
     // _copyAttributionRegion() uses an inclusive `start` and `end`.
-    final startCopyOffset = startOffset < text.length ? startOffset : text.length - 1;
+    final startCopyOffset =
+        startOffset < text.length ? startOffset : text.length - 1;
     int endCopyOffset;
     if (endOffset == startOffset) {
       endCopyOffset = startCopyOffset;
@@ -271,14 +278,16 @@ class AttributedText {
       );
     }
     if (text.isEmpty) {
-      _log.fine('our `text` is empty. Returning a direct copy of the `other` text.');
+      _log.fine(
+          'our `text` is empty. Returning a direct copy of the `other` text.');
       return AttributedText(
         other.text,
         other.spans.copy(),
       );
     }
 
-    final newSpans = spans.copy()..addAt(other: other.spans, index: text.length);
+    final newSpans = spans.copy()
+      ..addAt(other: other.spans, index: text.length);
     return AttributedText(
       text + other.text,
       newSpans,
@@ -308,7 +317,8 @@ class AttributedText {
     required int startOffset,
     Set<Attribution> applyAttributions = const {},
   }) {
-    _log.fine('text: "$textToInsert", start: $startOffset, attributions: $applyAttributions');
+    _log.fine(
+        'text: "$textToInsert", start: $startOffset, attributions: $applyAttributions');
 
     _log.fine('copying text to the left');
     final startText = copyText(0, startOffset);
@@ -340,8 +350,9 @@ class AttributedText {
     _log.fine('Removing text region from $startOffset to $endOffset');
     _log.fine('initial attributions:');
     _log.fine(spans.toString());
-    final reducedText = (startOffset > 0 ? text.substring(0, startOffset) : '') +
-        (endOffset < text.length ? text.substring(endOffset) : '');
+    final reducedText =
+        (startOffset > 0 ? text.substring(0, startOffset) : '') +
+            (endOffset < text.length ? text.substring(endOffset) : '');
 
     AttributedSpans contractedAttributions = spans.copy()
       ..contractAttributions(
@@ -390,7 +401,8 @@ class AttributedText {
       // at currentIndex.
       if (marker.offset != currentIndex) {
         if (currentIndex >= 0) {
-          visitor.visitAttributions(this, currentIndex, startingAttributions, endingAttributions);
+          visitor.visitAttributions(
+              this, currentIndex, startingAttributions, endingAttributions);
         }
 
         currentIndex = marker.offset;
@@ -407,7 +419,8 @@ class AttributedText {
 
     // Visit the final set of end markers.
     if (endingAttributions.isNotEmpty) {
-      visitor.visitAttributions(this, currentIndex, startingAttributions, endingAttributions);
+      visitor.visitAttributions(
+          this, currentIndex, startingAttributions, endingAttributions);
     }
 
     visitor.onVisitEnd();
@@ -468,7 +481,10 @@ class AttributedText {
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
-        other is AttributedText && runtimeType == other.runtimeType && text == other.text && spans == other.spans;
+        other is AttributedText &&
+            runtimeType == other.runtimeType &&
+            text == other.text &&
+            spans == other.spans;
   }
 
   @override
@@ -545,7 +561,8 @@ class CallbackAttributionVisitor implements AttributionVisitor {
     Set<Attribution> startingAttributions,
     Set<Attribution> endingAttributions,
   ) {
-    _onVisitAttributions(fullText, index, startingAttributions, endingAttributions);
+    _onVisitAttributions(
+        fullText, index, startingAttributions, endingAttributions);
   }
 
   @override

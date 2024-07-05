@@ -1,6 +1,3 @@
-import 'dart:convert';
-import 'dart:developer';
-
 import 'package:attributed_text/attributed_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -86,11 +83,22 @@ class ListItemNode extends TextNode {
   Map<String, dynamic> toJson() => {
         'blockType': metadata['blockType'],
         'id': id,
-        'text': text.text,
-        'textSpans': text.spans.markers.map((e) => e.toJson()).toList(),
+        'text': {
+          'text': text.text,
+          'spans': text.spans.markers.map((e) => e.toJson()).toList(),
+        },
         'type': type.name,
         'indent': _indent,
       };
+
+  factory ListItemNode.fromJson(Map<String, dynamic> json) {
+    return ListItemNode(
+      id: json['id'],
+      text: DocumentNode.getAttributedTextFromJson(json['text']),
+      itemType: ListItemType.values.firstWhere((e) => e.name == json['type']),
+      indent: json['indent'],
+    );
+  }
 
   @override
   bool hasEquivalentContent(DocumentNode other) {

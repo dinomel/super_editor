@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:super_editor/super_editor.dart';
@@ -48,10 +46,20 @@ class TaskNode extends TextNode {
   Map<String, dynamic> toJson() => {
         'blockType': metadata['blockType'],
         'id': id,
-        'text': text.text,
-        'textSpans': text.spans.markers.map((e) => e.toJson()).toList(),
+        'text': {
+          'text': text.text,
+          'spans': text.spans.markers.map((e) => e.toJson()).toList(),
+        },
         'isComplete': isComplete,
       };
+
+  factory TaskNode.fromJson(Map<String, dynamic> json) {
+    return TaskNode(
+      id: json['id'],
+      text: DocumentNode.getAttributedTextFromJson(json['text']),
+      isComplete: json['isComplete'],
+    );
+  }
 
   @override
   bool hasEquivalentContent(DocumentNode other) {

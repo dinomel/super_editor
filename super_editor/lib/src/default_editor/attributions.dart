@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:ui';
 
 import 'package:attributed_text/attributed_text.dart';
-import 'package:super_editor/src/default_editor/color_extension.dart';
+import 'package:super_editor/src/default_editor/extensions.dart';
 
 /// Header 1 style block attribution.
 const header1Attribution = NamedAttribution('header1');
