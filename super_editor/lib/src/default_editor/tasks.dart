@@ -48,7 +48,8 @@ class TaskNode extends TextNode {
   Map<String, dynamic> toJson() => {
         'blockType': metadata['blockType'],
         'id': id,
-        'text': text.spans.markers.map((e) => e.toJson()).toList(),
+        'text': text.text,
+        'textSpans': text.spans.markers.map((e) => e.toJson()).toList(),
         'isComplete': isComplete,
       };
 

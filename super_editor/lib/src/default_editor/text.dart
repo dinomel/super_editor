@@ -53,7 +53,8 @@ class TextNode extends DocumentNode with ChangeNotifier {
   Map<String, dynamic> toJson() => {
         'blockType': metadata['blockType'],
         'id': id,
-        'text': _text.spans.markers.map((e) => e.toJson()).toList()
+        'text': _text.text,
+        'textSpans': _text.spans.markers.map((e) => e.toJson()).toList()
       };
 
   @override
