@@ -538,7 +538,10 @@ class MutableDocument implements Document, Editable {
 
   final List<DocumentNode> _nodes;
 
-  String toJsonString() => jsonEncode(_nodes.map((e) => e.toJson()).toList());
+  String toJsonString() => jsonEncode(_nodes
+      .whereNot((note) => note is DragIndicatorNode)
+      .map((e) => e.toJson())
+      .toList());
 
   @override
   List<DocumentNode> get nodes => UnmodifiableListView(_nodes);
