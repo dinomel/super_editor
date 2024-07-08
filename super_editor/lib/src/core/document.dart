@@ -312,7 +312,7 @@ abstract class DocumentNode implements ChangeNotifier {
 
   static AttributedText getAttributedTextFromJson(Map<String, dynamic> json) {
     final spans = AttributedSpans(
-      attributions: json['spans'].map((json) {
+      attributions: json['spans'].map<SpanMarker>((json) {
         Attribution attribution;
         switch (json['attribution']['id']) {
           case 'font_size':
