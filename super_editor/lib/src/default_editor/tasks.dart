@@ -285,12 +285,16 @@ class _TaskComponentState extends State<TaskComponent>
 
   @override
   Widget build(BuildContext context) {
+    final style = widget.viewModel.textStyleBuilder({});
+    final height = (style.fontSize ?? 16) * (style.height ?? 1);
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Padding(
+        Container(
+          height: height,
           padding: const EdgeInsets.only(left: 16, right: 4),
           child: Checkbox(
+            shape: const CircleBorder(),
             value: widget.viewModel.isComplete,
             onChanged: (newValue) {
               widget.viewModel.setComplete(newValue!);
