@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:attributed_text/attributed_text.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -158,7 +156,6 @@ class DragIndicatorComponent extends StatelessWidget {
     required this.componentKey,
     required this.nodeId,
     required this.color,
-    this.thickness = 2,
     this.selectionColor = Colors.blue,
     this.selection,
     required this.caretColor,
@@ -168,7 +165,6 @@ class DragIndicatorComponent extends StatelessWidget {
   final String nodeId;
   final GlobalKey componentKey;
   final Color color;
-  final double thickness;
   final Color selectionColor;
   final UpstreamDownstreamNodeSelection? selection;
   final Color caretColor;
@@ -188,7 +184,7 @@ class DragIndicatorComponent extends StatelessWidget {
               child: Divider(
                 height: 0,
                 color: isDragNodeVisible ? color : Colors.transparent,
-                thickness: thickness,
+                thickness: 2,
               ),
             ),
           ),

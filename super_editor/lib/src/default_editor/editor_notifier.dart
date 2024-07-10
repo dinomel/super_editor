@@ -12,11 +12,12 @@ class EditorNotifier extends ChangeNotifier {
   double? dragPositionDeltaY;
   Timer? dragAutoscrollTimer;
   double? screenHeight;
+  final double topPadding;
   final autoscrollCoefficient = 8;
 
   bool isDragNodeVisible(String nodeId) => dragNodeID == nodeId;
 
-  EditorNotifier({required this.doc});
+  EditorNotifier({required this.doc, this.topPadding = 0});
 
   @override
   void dispose() {
@@ -31,13 +32,15 @@ class EditorNotifier extends ChangeNotifier {
     required int Function(double) findComponentIndexAtOffset,
     required String nodeId,
   }) {
+    final mediaQuery = MediaQuery.of(Scaffold.of(context).context);
     screenHeight = MediaQuery.of(context).size.height -
-        MediaQuery.of(Scaffold.of(context).context).viewInsets.bottom;
+        mediaQuery.viewInsets.bottom -
+        topPadding;
     _setAutoscrollTimer();
-    dragPositionDeltaY = details.globalPosition.dy;
+    dragPositionDeltaY = details.globalPosition.dy - topPadding;
     final nodeIndex = doc.getNodeIndexById(nodeId);
     final newIndex = findComponentIndexAtOffset(
-      details.globalPosition.dy + scrollController.offset,
+      details.globalPosition.dy - topPadding + scrollController.offset,
     );
     if (dragIndex == newIndex) return;
     // if (dragIndex == newIndex || dragIndex == newIndex - 1) return;

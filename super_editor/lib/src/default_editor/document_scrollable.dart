@@ -84,8 +84,8 @@ class _DocumentScrollableState extends State<DocumentScrollable> with SingleTick
       // our ScrollController isn't attached to the Scrollable, yet.
       widget.autoScroller.attachScrollable(
         this,
-        () => _viewport,
-        () => _scrollPosition,
+            () => _viewport,
+            () => _scrollPosition,
       );
 
       widget.scroller?.attach(_scrollPosition);
@@ -121,8 +121,8 @@ class _DocumentScrollableState extends State<DocumentScrollable> with SingleTick
       oldWidget.autoScroller.detachScrollable();
       widget.autoScroller.attachScrollable(
         this,
-        () => _viewport,
-        () => _scrollPosition,
+            () => _viewport,
+            () => _scrollPosition,
       );
     }
 
@@ -162,7 +162,7 @@ class _DocumentScrollableState extends State<DocumentScrollable> with SingleTick
   /// is the viewport `RenderBox`.
   RenderBox get _viewport =>
       (context.findAncestorScrollableWithVerticalScroll?.context.findRenderObject() ?? context.findRenderObject())
-          as RenderBox;
+      as RenderBox;
 
   /// Returns the `ScrollPosition` that controls the scroll offset of
   /// this widget.
@@ -203,6 +203,7 @@ class _DocumentScrollableState extends State<DocumentScrollable> with SingleTick
       child: ScrollConfiguration(
         behavior: scrollBehavior.copyWith(scrollbars: false),
         child: SingleChildScrollView(
+          padding: const EdgeInsets.only(top: 2),
           controller: _scrollController,
           physics: const NeverScrollableScrollPhysics(),
           child: child,
