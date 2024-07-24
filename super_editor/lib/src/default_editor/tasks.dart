@@ -99,7 +99,7 @@ final taskStyles = StyleRule(
 /// Builds [TaskComponentViewModel]s and [TaskComponent]s for every
 /// [TaskNode] in a document.
 class TaskComponentBuilder implements ComponentBuilder {
-  TaskComponentBuilder([this._editor]);
+  const TaskComponentBuilder([this._editor]);
 
   final Editor? _editor;
 
