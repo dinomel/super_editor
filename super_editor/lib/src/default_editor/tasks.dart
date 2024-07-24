@@ -295,17 +295,18 @@ class _TaskComponentState extends State<TaskComponent>
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Container(
-          height: height,
-          padding: const EdgeInsets.only(left: 16, right: 4),
-          child: Checkbox(
-            shape: const CircleBorder(),
-            value: widget.viewModel.isComplete,
-            onChanged: notifier.editable
-                ? (newValue) {
-                    widget.viewModel.setComplete(newValue!);
-                  }
-                : null,
+        IgnorePointer(
+          ignoring: !notifier.editable,
+          child: Container(
+            height: height,
+            padding: const EdgeInsets.only(left: 16, right: 4),
+            child: Checkbox(
+              shape: const CircleBorder(),
+              value: widget.viewModel.isComplete,
+              onChanged: (newValue) {
+                widget.viewModel.setComplete(newValue!);
+              },
+            ),
           ),
         ),
         Expanded(
