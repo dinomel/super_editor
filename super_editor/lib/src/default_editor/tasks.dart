@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:super_editor/super_editor.dart';
+import 'package:provider/provider.dart';
+import 'package:super_editor/src/default_editor/editor_notifier.dart';
 
 /// This file includes everything needed to add the concept of a task
 /// to Super Editor. This includes:
@@ -97,13 +99,15 @@ final taskStyles = StyleRule(
 /// Builds [TaskComponentViewModel]s and [TaskComponent]s for every
 /// [TaskNode] in a document.
 class TaskComponentBuilder implements ComponentBuilder {
-  TaskComponentBuilder(this._editor);
+  TaskComponentBuilder([this._editor]);
 
-  final Editor _editor;
+  final Editor? _editor;
 
   @override
   TaskComponentViewModel? createViewModel(
-      Document document, DocumentNode node) {
+    Document document,
+    DocumentNode node,
+  ) {
     if (node is! TaskNode) {
       return null;
     }
@@ -113,7 +117,7 @@ class TaskComponentBuilder implements ComponentBuilder {
       padding: EdgeInsets.zero,
       isComplete: node.isComplete,
       setComplete: (bool isComplete) {
-        _editor.execute([
+        _editor?.execute([
           ChangeTaskCompletionRequest(
             nodeId: node.id,
             isComplete: isComplete,
@@ -285,6 +289,7 @@ class _TaskComponentState extends State<TaskComponent>
 
   @override
   Widget build(BuildContext context) {
+    final notifier = context.read<EditorNotifier>();
     final style = widget.viewModel.textStyleBuilder({});
     final height = (style.fontSize ?? 16) * (style.height ?? 1);
     return Row(
@@ -296,9 +301,11 @@ class _TaskComponentState extends State<TaskComponent>
           child: Checkbox(
             shape: const CircleBorder(),
             value: widget.viewModel.isComplete,
-            onChanged: (newValue) {
-              widget.viewModel.setComplete(newValue!);
-            },
+            onChanged: notifier.editable
+                ? (newValue) {
+                    widget.viewModel.setComplete(newValue!);
+                  }
+                : null,
           ),
         ),
         Expanded(

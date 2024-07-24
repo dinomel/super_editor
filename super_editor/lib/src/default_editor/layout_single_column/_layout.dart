@@ -1077,73 +1077,60 @@ class _Component extends StatelessWidget {
         componentContext,
         componentViewModel,
       );
-      var feedback = componentBuilder.createComponent(
-        feedbackContext,
-        componentViewModel,
-      );
       final notifier = context.read<EditorNotifier>();
       if (component != null) {
         // TODO: we might need a SizeChangedNotifier here for the case where two components
         //       change size exactly inversely
-        component = LongPressDraggable(
-          hitTestBehavior: HitTestBehavior.translucent,
-          onDragUpdate: (details) {
-            notifier.onDragUpdate(
-              context: context,
-              details: details,
-              findComponentIndexAtOffset: findClosestDragIndexAtOffset,
-              nodeId: componentViewModel.nodeId,
-            );
-          },
-          onDraggableCanceled: notifier.onDraggableCanceled,
-          onDragCompleted: notifier.onDragCompleted,
-          onDragEnd: (_) => notifier.onDragEnd(componentViewModel.nodeId),
-          feedback: Material(
-            color: Colors.transparent,
-            child: Opacity(
-              opacity: 0.6,
-              child: ConstrainedBox(
-                constraints: BoxConstraints(
-                  maxWidth: MediaQuery.of(context).size.width,
-                ),
-                child: SizedBox(
-                  width: double.infinity,
-                  child: Padding(
-                    padding: componentViewModel.padding,
-                    child: feedback,
+        component = ConstrainedBox(
+          constraints: BoxConstraints(
+              maxWidth: componentViewModel.maxWidth ?? double.infinity),
+          child: SizedBox(
+            width: double.infinity,
+            child: Padding(
+              padding: componentViewModel.padding,
+              child: component,
+            ),
+          ),
+        );
+        if (notifier.editable) {
+          var feedback = componentBuilder.createComponent(
+            feedbackContext,
+            componentViewModel,
+          );
+          component = LongPressDraggable(
+            hitTestBehavior: HitTestBehavior.translucent,
+            onDragUpdate: (details) {
+              notifier.onDragUpdate(
+                context: context,
+                details: details,
+                findComponentIndexAtOffset: findClosestDragIndexAtOffset,
+                nodeId: componentViewModel.nodeId,
+              );
+            },
+            onDraggableCanceled: notifier.onDraggableCanceled,
+            onDragCompleted: notifier.onDragCompleted,
+            onDragEnd: (_) => notifier.onDragEnd(componentViewModel.nodeId),
+            feedback: Material(
+              color: Colors.transparent,
+              child: Opacity(
+                opacity: 0.6,
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                    maxWidth: MediaQuery.of(context).size.width,
+                  ),
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: Padding(
+                      padding: componentViewModel.padding,
+                      child: feedback,
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
-          // childWhenDragging: Opacity(
-          //   // key: ValueKey('lpd-${componentViewModel.nodeId}'),
-          //   opacity: 0.3,
-          //   child: ConstrainedBox(
-          //     constraints: BoxConstraints(
-          //         maxWidth: componentViewModel.maxWidth ?? double.infinity),
-          //     child: SizedBox(
-          //       width: double.infinity,
-          //       child: Padding(
-          //         padding: componentViewModel.padding,
-          //         child: component,
-          //       ),
-          //     ),
-          //   ),
-          // ),
-          child: ConstrainedBox(
-            constraints: BoxConstraints(
-                maxWidth: componentViewModel.maxWidth ?? double.infinity),
-            child: SizedBox(
-              width: double.infinity,
-              child: Padding(
-                padding: componentViewModel.padding,
-                child: component,
-              ),
-            ),
-          ),
-        );
-
+            child: component,
+          );
+        }
         return showDebugPaint ? _wrapWithDebugWidget(component) : component;
       }
     }

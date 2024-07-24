@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:super_editor/super_editor.dart';
 
 class EditorNotifier extends ChangeNotifier {
+  final bool editable;
+
   MutableDocument doc;
   ScrollController scrollController = ScrollController();
   int? dragIndex;
@@ -17,7 +19,11 @@ class EditorNotifier extends ChangeNotifier {
 
   bool isDragNodeVisible(String nodeId) => dragNodeID == nodeId;
 
-  EditorNotifier({required this.doc, this.topPadding = 0});
+  EditorNotifier({
+    required this.doc,
+    this.topPadding = 0,
+    this.editable = true,
+  });
 
   @override
   void dispose() {
