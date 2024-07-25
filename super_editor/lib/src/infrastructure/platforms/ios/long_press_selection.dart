@@ -45,6 +45,8 @@ class IosLongPressSelectionStrategy {
     }
 
     _longPressInitialSelection = getWordSelection(docPosition: docPosition, docLayout: _docLayout);
+    if (_longPressInitialSelection == null) return false;
+
     _select(_longPressInitialSelection!);
     return true;
   }

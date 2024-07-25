@@ -168,6 +168,8 @@ class AndroidDocumentLongPressSelectionStrategy {
     }
 
     _longPressInitialSelection = getWordSelection(docPosition: docPosition, docLayout: _docLayout);
+    if (_longPressInitialSelection == null) return false;
+
     _select(_longPressInitialSelection!);
 
     // Initially, the word vs character selection bound tracking is set equal to
