@@ -6,7 +6,10 @@ import 'package:super_editor/super_editor.dart';
 
 class EditorNotifier extends ChangeNotifier {
   final bool editable;
-
+  final MutableDocumentComposer composer = MutableDocumentComposer();
+  late Editor docEditor;
+  final docLayoutKey = GlobalKey();
+  late final CommonEditorOperations docOps;
   MutableDocument doc;
   ScrollController scrollController = ScrollController();
   int? dragIndex;
@@ -23,12 +26,25 @@ class EditorNotifier extends ChangeNotifier {
     required this.doc,
     this.topPadding = 0,
     this.editable = true,
-  });
+  }) {
+    //TODO: DINO: Ovo je kad se selectuje text
+    composer.selectionNotifier.addListener(() {
+      log('composer.selectionNotifier listener triggered');
+    });
+    docEditor = createDefaultDocumentEditor(document: doc, composer: composer);
+    docOps = CommonEditorOperations(
+      editor: docEditor,
+      document: doc,
+      composer: composer,
+      documentLayoutResolver: () => docLayoutKey.currentState as DocumentLayout,
+    );
+  }
 
   @override
   void dispose() {
     scrollController.dispose();
     dragAutoscrollTimer?.cancel();
+    composer.dispose();
     super.dispose();
   }
 
@@ -71,14 +87,10 @@ class EditorNotifier extends ChangeNotifier {
       log('dragNode is null!');
       return;
     }
-    doc.moveNode(
-      nodeId: nodeId,
-      targetIndex: dragIndex!,
-    );
-    doc.moveNode(
-      nodeId: dragNode.id,
-      targetIndex: dragIndex!,
-    );
+    docEditor.execute([
+      MoveNodeRequest(nodeId: nodeId, newIndex: dragIndex!),
+      MoveNodeRequest(nodeId: dragNode.id, newIndex: dragIndex!),
+    ]);
     dragIndex = null;
     dragNodeID = null;
     dragPositionDeltaY = null;
