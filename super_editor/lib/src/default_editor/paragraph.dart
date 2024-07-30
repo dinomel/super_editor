@@ -34,10 +34,15 @@ class ParagraphNode extends TextNode {
     }
   }
 
-  factory ParagraphNode.fromJson(Map<String, dynamic> json) {
+  factory ParagraphNode.fromJson(
+    Map<String, dynamic> json, [
+    String? blockType,
+  ]) {
     return ParagraphNode(
       id: json['id'],
       text: DocumentNode.getAttributedTextFromJson(json['text']),
+      metadata:
+          blockType == null ? null : {"blockType": NamedAttribution(blockType)},
     );
   }
 }
