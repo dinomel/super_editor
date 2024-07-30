@@ -91,7 +91,7 @@ final taskStyles = StyleRule(
     }
 
     return {
-      Styles.padding: const CascadingPadding.only(top: 24),
+      Styles.padding: const CascadingPadding.only(top: 4),
     };
   },
 );
@@ -299,13 +299,16 @@ class _TaskComponentState extends State<TaskComponent>
           ignoring: !notifier.editable,
           child: Container(
             height: height,
-            padding: const EdgeInsets.only(left: 16, right: 4),
-            child: Checkbox(
-              shape: const CircleBorder(),
-              value: widget.viewModel.isComplete,
-              onChanged: (newValue) {
-                widget.viewModel.setComplete(newValue!);
-              },
+            padding: const EdgeInsets.only(left: 16),
+            child: Transform.scale(
+              scale: 1.2,
+              child: Checkbox(
+                shape: const CircleBorder(),
+                value: widget.viewModel.isComplete,
+                onChanged: (newValue) {
+                  widget.viewModel.setComplete(newValue!);
+                },
+              ),
             ),
           ),
         ),
