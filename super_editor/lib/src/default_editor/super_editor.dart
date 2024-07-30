@@ -1422,7 +1422,7 @@ final defaultStylesheet = Stylesheet(
       const BlockSelector("header1"),
       (doc, docNode) {
         return {
-          Styles.padding: const CascadingPadding.only(top: 40),
+          Styles.padding: const CascadingPadding.only(top: 32),
           Styles.textStyle: const TextStyle(
             color: Color(0xFF333333),
             fontSize: 38,
@@ -1435,7 +1435,7 @@ final defaultStylesheet = Stylesheet(
       const BlockSelector("header2"),
       (doc, docNode) {
         return {
-          Styles.padding: const CascadingPadding.only(top: 32),
+          Styles.padding: const CascadingPadding.only(top: 28),
           Styles.textStyle: const TextStyle(
             color: Color(0xFF333333),
             fontSize: 26,
@@ -1448,7 +1448,7 @@ final defaultStylesheet = Stylesheet(
       const BlockSelector("header3"),
       (doc, docNode) {
         return {
-          Styles.padding: const CascadingPadding.only(top: 28),
+          Styles.padding: const CascadingPadding.only(top: 24),
           Styles.textStyle: const TextStyle(
             color: Color(0xFF333333),
             fontSize: 22,
@@ -1461,7 +1461,7 @@ final defaultStylesheet = Stylesheet(
       const BlockSelector("paragraph"),
       (doc, docNode) {
         return {
-          Styles.padding: const CascadingPadding.only(top: 24),
+          Styles.padding: const CascadingPadding.only(top: 8),
         };
       },
     ),
@@ -1493,7 +1493,7 @@ final defaultStylesheet = Stylesheet(
       const BlockSelector("listItem"),
       (doc, docNode) {
         return {
-          Styles.padding: const CascadingPadding.only(top: 24),
+          Styles.padding: const CascadingPadding.only(top: 8),
         };
       },
     ),
