@@ -299,7 +299,7 @@ class _TaskComponentState extends State<TaskComponent>
           ignoring: !notifier.editable,
           child: Container(
             height: height,
-            padding: const EdgeInsets.only(left: 16),
+            padding: const EdgeInsets.only(left: 8),
             child: Transform.scale(
               scale: 1.2,
               child: Checkbox(
