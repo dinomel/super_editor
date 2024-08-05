@@ -64,7 +64,9 @@ class DocumentSelection extends DocumentRange {
   ///
   /// A [DocumentSelection] is "collapsed" when its [base] and [extent] are
   /// equivalent. Otherwise, the [DocumentSelection] is "expanded".
-  bool get isCollapsed => base.nodeId == extent.nodeId && base.nodePosition.isEquivalentTo(extent.nodePosition);
+  bool get isCollapsed =>
+      base.nodeId == extent.nodeId &&
+      base.nodePosition.isEquivalentTo(extent.nodePosition);
 
   /// Returns the affinity (direction) for this selection - downstream refers to a selection
   /// that starts at earlier content and ends at later content, upstream refers to a selection
@@ -72,17 +74,20 @@ class DocumentSelection extends DocumentRange {
   ///
   /// Calculating the selection affinity requires a [Document] because only the [Document] knows the
   /// relative position of various [DocumentPosition]s.
-  TextAffinity calculateAffinity(Document document) => document.getAffinityBetween(base: base, extent: extent);
+  TextAffinity calculateAffinity(Document document) =>
+      document.getAffinityBetween(base: base, extent: extent);
 
   /// Returns `true` if this selection has an affinity of [TextAffinity.downstream].
   ///
   /// See [calculateAffinity] for more info.
-  bool hasDownstreamAffinity(Document document) => calculateAffinity(document) == TextAffinity.downstream;
+  bool hasDownstreamAffinity(Document document) =>
+      calculateAffinity(document) == TextAffinity.downstream;
 
   /// Returns `true` if this selection has an affinity of [TextAffinity.upstream].
   ///
   /// See [calculateAffinity] for more info.
-  bool hasUpstreamAffinity(Document document) => calculateAffinity(document) == TextAffinity.upstream;
+  bool hasUpstreamAffinity(Document document) =>
+      calculateAffinity(document) == TextAffinity.upstream;
 
   @override
   String toString() {
@@ -148,7 +153,8 @@ class DocumentSelection extends DocumentRange {
       );
     }
 
-    return document.getNodeIndexById(baseNode.id) < document.getNodeIndexById(extentNode.id)
+    return document.getNodeIndexById(baseNode.id) <
+            document.getNodeIndexById(extentNode.id)
         ? DocumentSelection.collapsed(position: base)
         : DocumentSelection.collapsed(position: extent);
   }
@@ -187,15 +193,14 @@ class DocumentSelection extends DocumentRange {
       );
     }
 
-    return document.getNodeIndexById(baseNode.id) > document.getNodeIndexById(extentNode.id)
+    return document.getNodeIndexById(baseNode.id) >
+            document.getNodeIndexById(extentNode.id)
         ? DocumentSelection.collapsed(position: base)
         : DocumentSelection.collapsed(position: extent);
   }
 
   @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is DocumentSelection && runtimeType == other.runtimeType && base == other.base && extent == other.extent;
+  bool operator ==(Object other) => identical(this, other);
 
   @override
   int get hashCode => base.hashCode ^ extent.hashCode;
@@ -259,7 +264,8 @@ class DocumentRange {
   final DocumentPosition end;
 
   /// Returns `true` if [start] appears at, or before [end], or `false` otherwise.
-  bool isNormalized(Document document) => document.getAffinityForRange(this) == TextAffinity.downstream;
+  bool isNormalized(Document document) =>
+      document.getAffinityForRange(this) == TextAffinity.downstream;
 
   /// Returns a version of this [DocumentRange] that's normalized.
   ///
@@ -276,7 +282,10 @@ class DocumentRange {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is DocumentRange && runtimeType == other.runtimeType && start == other.start && end == other.end;
+      other is DocumentRange &&
+          runtimeType == other.runtimeType &&
+          start == other.start &&
+          end == other.end;
 
   @override
   int get hashCode => start.hashCode ^ end.hashCode;
@@ -322,7 +331,8 @@ extension InspectDocumentAffinity on Document {
     } else {
       // The selection is within the same node. Ask the node which position
       // comes first.
-      affinity = extentNode.getAffinityBetween(base: base.nodePosition, extent: extent.nodePosition);
+      affinity = extentNode.getAffinityBetween(
+          base: base.nodePosition, extent: extent.nodePosition);
     }
 
     return affinity;
@@ -332,8 +342,10 @@ extension InspectDocumentAffinity on Document {
 extension InspectDocumentRange on Document {
   /// Returns a [DocumentRange] that ranges from [position1] to [position2],
   /// including [position1] and [position2].
-  DocumentRange getRangeBetween(DocumentPosition position1, DocumentPosition position2) {
-    late TextAffinity affinity = getAffinityBetween(base: position1, extent: position2);
+  DocumentRange getRangeBetween(
+      DocumentPosition position1, DocumentPosition position2) {
+    late TextAffinity affinity =
+        getAffinityBetween(base: position1, extent: position2);
     return DocumentRange(
       start: affinity == TextAffinity.downstream ? position1 : position2,
       end: affinity == TextAffinity.downstream ? position2 : position1,
@@ -345,9 +357,11 @@ extension InspectDocumentSelection on Document {
   /// Returns a list of all the `DocumentNodes` within the given [selection], ordered
   /// from upstream to downstream.
   List<DocumentNode> getNodesInContentOrder(DocumentSelection selection) {
-    final upstreamPosition = selectUpstreamPosition(selection.base, selection.extent);
+    final upstreamPosition =
+        selectUpstreamPosition(selection.base, selection.extent);
     final upstreamIndex = getNodeIndexById(upstreamPosition.nodeId);
-    final downstreamPosition = selectDownstreamPosition(selection.base, selection.extent);
+    final downstreamPosition =
+        selectDownstreamPosition(selection.base, selection.extent);
     final downstreamIndex = getNodeIndexById(downstreamPosition.nodeId);
 
     return nodes.sublist(upstreamIndex, downstreamIndex + 1);
@@ -355,7 +369,8 @@ extension InspectDocumentSelection on Document {
 
   /// Given [docPosition1] and [docPosition2], returns the `DocumentPosition` that
   /// appears first in the document.
-  DocumentPosition selectUpstreamPosition(DocumentPosition docPosition1, DocumentPosition docPosition2) {
+  DocumentPosition selectUpstreamPosition(
+      DocumentPosition docPosition1, DocumentPosition docPosition2) {
     final docPosition1Node = getNodeById(docPosition1.nodeId)!;
     final docPosition1NodeIndex = getNodeIndexById(docPosition1Node.id);
     final docPosition2Node = getNodeById(docPosition2.nodeId)!;
@@ -370,7 +385,8 @@ extension InspectDocumentSelection on Document {
     // Both document positions are in the same node. Figure out which
     // node position comes first.
     final theNode = docPosition1Node;
-    return theNode.selectUpstreamPosition(docPosition1.nodePosition, docPosition2.nodePosition) ==
+    return theNode.selectUpstreamPosition(
+                docPosition1.nodePosition, docPosition2.nodePosition) ==
             docPosition1.nodePosition
         ? docPosition1
         : docPosition2;
@@ -378,14 +394,16 @@ extension InspectDocumentSelection on Document {
 
   /// Given [docPosition1] and [docPosition2], returns the `DocumentPosition` that
   /// appears last in the document.
-  DocumentPosition selectDownstreamPosition(DocumentPosition docPosition1, DocumentPosition docPosition2) {
+  DocumentPosition selectDownstreamPosition(
+      DocumentPosition docPosition1, DocumentPosition docPosition2) {
     final upstreamPosition = selectUpstreamPosition(docPosition1, docPosition2);
     return upstreamPosition == docPosition1 ? docPosition2 : docPosition1;
   }
 
   /// Returns `true` if, and only if, the given [position] sits within the
   /// given [selection] in this `Document`.
-  bool doesSelectionContainPosition(DocumentSelection selection, DocumentPosition position) {
+  bool doesSelectionContainPosition(
+      DocumentSelection selection, DocumentPosition position) {
     if (selection.isCollapsed) {
       return false;
     }
@@ -395,14 +413,19 @@ extension InspectDocumentSelection on Document {
     final extentNode = getNodeById(selection.extent.nodeId)!;
     final extentNodeIndex = getNodeIndexById(extentNode.id);
 
-    final upstreamNode = baseNodeIndex < extentNodeIndex ? baseNode : extentNode;
-    final upstreamNodeIndex = baseNodeIndex < extentNodeIndex ? baseNodeIndex : extentNodeIndex;
-    final downstreamNode = baseNodeIndex < extentNodeIndex ? extentNode : baseNode;
-    final downstreamNodeIndex = baseNodeIndex < extentNodeIndex ? extentNodeIndex : baseNodeIndex;
+    final upstreamNode =
+        baseNodeIndex < extentNodeIndex ? baseNode : extentNode;
+    final upstreamNodeIndex =
+        baseNodeIndex < extentNodeIndex ? baseNodeIndex : extentNodeIndex;
+    final downstreamNode =
+        baseNodeIndex < extentNodeIndex ? extentNode : baseNode;
+    final downstreamNodeIndex =
+        baseNodeIndex < extentNodeIndex ? extentNodeIndex : baseNodeIndex;
 
     final positionNodeIndex = getNodeIndexById(position.nodeId);
 
-    if (upstreamNodeIndex < positionNodeIndex && positionNodeIndex < downstreamNodeIndex) {
+    if (upstreamNodeIndex < positionNodeIndex &&
+        positionNodeIndex < downstreamNodeIndex) {
       // The given position is sandwiched between two other nodes that form
       // the bounds of the selection. Therefore, the position is definitely within
       // the selection.
@@ -410,37 +433,49 @@ extension InspectDocumentSelection on Document {
     }
 
     if (positionNodeIndex == upstreamNodeIndex) {
-      final upstreamPosition = selectUpstreamPosition(selection.base, selection.extent);
-      final downstreamPosition = upstreamPosition == selection.base ? selection.extent : selection.base;
+      final upstreamPosition =
+          selectUpstreamPosition(selection.base, selection.extent);
+      final downstreamPosition = upstreamPosition == selection.base
+          ? selection.extent
+          : selection.base;
 
       // This is the furthest a position could sit in the upstream node
       // and still contain the given position. Keep in mind that the
       // upstream position, downstream position, and given position may
       // all reside in the same node (in fact, they probably do).
-      final downstreamCap =
-          upstreamNodeIndex == downstreamNodeIndex ? downstreamPosition.nodePosition : upstreamNode.endPosition;
+      final downstreamCap = upstreamNodeIndex == downstreamNodeIndex
+          ? downstreamPosition.nodePosition
+          : upstreamNode.endPosition;
 
       // If and only if the given position comes after the upstream position,
       // and before the downstream cap, then the position is within the selection.
-      return upstreamNode.selectDownstreamPosition(upstreamPosition.nodePosition, position.nodePosition) ==
-          upstreamNode.selectUpstreamPosition(position.nodePosition, downstreamCap);
+      return upstreamNode.selectDownstreamPosition(
+              upstreamPosition.nodePosition, position.nodePosition) ==
+          upstreamNode.selectUpstreamPosition(
+              position.nodePosition, downstreamCap);
     }
 
     if (positionNodeIndex == downstreamNodeIndex) {
-      final upstreamPosition = selectUpstreamPosition(selection.base, selection.extent);
-      final downstreamPosition = upstreamPosition == selection.base ? selection.extent : selection.base;
+      final upstreamPosition =
+          selectUpstreamPosition(selection.base, selection.extent);
+      final downstreamPosition = upstreamPosition == selection.base
+          ? selection.extent
+          : selection.base;
 
       // This is the furthest upstream that a position could sit in the
       // downstream node and still contain the given position. Keep in
       // mind that the upstream position, downstream position, and given
       // position may all reside in the same node (in fact, they probably do).
-      final upstreamCap =
-          downstreamNodeIndex == upstreamNodeIndex ? upstreamPosition.nodePosition : downstreamNode.beginningPosition;
+      final upstreamCap = downstreamNodeIndex == upstreamNodeIndex
+          ? upstreamPosition.nodePosition
+          : downstreamNode.beginningPosition;
 
       // If and only if the given position comes before the downstream position,
       // and after the upstream cap, then the position is within the selection.
-      return downstreamNode.selectDownstreamPosition(upstreamCap, position.nodePosition) ==
-          downstreamNode.selectUpstreamPosition(position.nodePosition, downstreamPosition.nodePosition);
+      return downstreamNode.selectDownstreamPosition(
+              upstreamCap, position.nodePosition) ==
+          downstreamNode.selectUpstreamPosition(
+              position.nodePosition, downstreamPosition.nodePosition);
     }
 
     // If we got here, then the position is either before the upstream

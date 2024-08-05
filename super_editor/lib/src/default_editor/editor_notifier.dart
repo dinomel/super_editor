@@ -27,10 +27,6 @@ class EditorNotifier extends ChangeNotifier {
     this.topPadding = 0,
     this.editable = true,
   }) {
-    //TODO: DINO: Ovo je kad se selectuje text
-    composer.selectionNotifier.addListener(() {
-      log('composer.selectionNotifier listener triggered');
-    });
     docEditor = createDefaultDocumentEditor(document: doc, composer: composer);
     docOps = CommonEditorOperations(
       editor: docEditor,
