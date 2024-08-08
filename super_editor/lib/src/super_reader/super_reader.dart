@@ -74,7 +74,10 @@ class SuperReader extends StatefulWidget {
         keyboardActions = keyboardActions ?? readOnlyDefaultKeyboardActions,
         componentBuilders = componentBuilders != null
             ? [...componentBuilders, const UnknownComponentBuilder()]
-            : [...readOnlyDefaultComponentBuilders, const UnknownComponentBuilder()],
+            : [
+                ...readOnlyDefaultComponentBuilders,
+                const UnknownComponentBuilder()
+              ],
         super(key: key);
 
   final FocusNode? focusNode;
@@ -184,11 +187,13 @@ class SuperReader extends StatefulWidget {
   final WidgetBuilder? androidToolbarBuilder;
 
   /// Color of the text selection drag handles on iOS.
-  @Deprecated("To configure handle color, surround SuperEditor with an IosEditorControlsScope, instead")
+  @Deprecated(
+      "To configure handle color, surround SuperEditor with an IosEditorControlsScope, instead")
   final Color? iOSHandleColor;
 
   /// Builder that creates a floating toolbar when running on iOS.
-  @Deprecated("To configure a toolbar builder, surround SuperEditor with an IosEditorControlsScope, instead")
+  @Deprecated(
+      "To configure a toolbar builder, surround SuperEditor with an IosEditorControlsScope, instead")
   final WidgetBuilder? iOSToolbarBuilder;
 
   /// Creates a clipper that applies to overlay controls, like drag
@@ -198,7 +203,8 @@ class SuperReader extends StatefulWidget {
   /// If no clipper factory method is provided, then the overlay controls
   /// will be allowed to appear anywhere in the overlay in which they sit
   /// (probably the entire screen).
-  final CustomClipper<Rect> Function(BuildContext overlayContext)? createOverlayControlsClipper;
+  final CustomClipper<Rect> Function(BuildContext overlayContext)?
+      createOverlayControlsClipper;
 
   /// Paints some extra visual ornamentation to help with
   /// debugging.
@@ -213,6 +219,7 @@ class SuperReaderState extends State<SuperReader> {
   Document get document => widget.document;
 
   late final ValueNotifier<DocumentSelection?> _selection;
+
   @visibleForTesting
   DocumentSelection? get selection => _selection.value;
 
@@ -222,7 +229,8 @@ class SuperReaderState extends State<SuperReader> {
   final _documentLayoutLink = LayerLink();
   SingleColumnLayoutPresenter? _docLayoutPresenter;
   late SingleColumnStylesheetStyler _docStylesheetStyler;
-  late SingleColumnLayoutCustomComponentStyler _docLayoutPerComponentBlockStyler;
+  late SingleColumnLayoutCustomComponentStyler
+      _docLayoutPerComponentBlockStyler;
   late SingleColumnLayoutSelectionStyler _docLayoutSelectionStyler;
 
   ContentTapDelegate? _contentTapDelegate;
@@ -316,7 +324,8 @@ class SuperReaderState extends State<SuperReader> {
     );
 
     _contentTapDelegate?.dispose();
-    _contentTapDelegate = widget.contentTapDelegateFactory?.call(_readerContext);
+    _contentTapDelegate =
+        widget.contentTapDelegateFactory?.call(_readerContext);
   }
 
   void _createLayoutPresenter() {
@@ -328,7 +337,8 @@ class SuperReaderState extends State<SuperReader> {
       stylesheet: widget.stylesheet,
     );
 
-    _docLayoutPerComponentBlockStyler = SingleColumnLayoutCustomComponentStyler();
+    _docLayoutPerComponentBlockStyler =
+        SingleColumnLayoutCustomComponentStyler();
 
     _docLayoutSelectionStyler = SingleColumnLayoutSelectionStyler(
       document: widget.document,
@@ -403,7 +413,8 @@ class SuperReaderState extends State<SuperReader> {
               componentBuilders: widget.componentBuilders,
               underlays: [
                 // Add any underlays that were provided by the client.
-                for (final underlayBuilder in widget.documentUnderlayBuilders) //
+                for (final underlayBuilder
+                    in widget.documentUnderlayBuilders) //
                   (context) => underlayBuilder.build(context, _readerContext),
               ],
               overlays: [
@@ -460,7 +471,9 @@ class SuperReaderState extends State<SuperReader> {
       case DocumentGestureMode.iOS:
         return SuperReaderIosToolbarOverlayManager(
           tapRegionGroupId: widget.tapRegionGroupId,
-          defaultToolbarBuilder: (overlayContext, mobileToolbarKey, focalPoint) => defaultIosReaderToolbarBuilder(
+          defaultToolbarBuilder:
+              (overlayContext, mobileToolbarKey, focalPoint) =>
+                  defaultIosReaderToolbarBuilder(
             overlayContext,
             mobileToolbarKey,
             focalPoint,
@@ -501,8 +514,10 @@ class SuperReaderState extends State<SuperReader> {
           selectionLinks: _selectionLinks,
           contentTapHandler: _contentTapDelegate,
           scrollController: _scrollController,
-          handleColor: widget.androidHandleColor ?? Theme.of(context).primaryColor,
-          popoverToolbarBuilder: widget.androidToolbarBuilder ?? (_) => const SizedBox(),
+          handleColor:
+              widget.androidHandleColor ?? Theme.of(context).primaryColor,
+          popoverToolbarBuilder:
+              widget.androidToolbarBuilder ?? (_) => const SizedBox(),
           createOverlayControlsClipper: widget.createOverlayControlsClipper,
           showDebugPaint: widget.debugPaint.gestures,
           overlayController: widget.overlayController,
@@ -602,7 +617,8 @@ const defaultSuperReaderDocumentOverlayBuilders = [
 /// A [SuperReaderDocumentLayerBuilder] that builds a [SelectionLeadersDocumentLayer], which positions
 /// leader widgets at the base and extent of the user's selection, so that other widgets
 /// can position themselves relative to the user's selection.
-class _SelectionLeadersDocumentLayerBuilder implements SuperReaderDocumentLayerBuilder {
+class _SelectionLeadersDocumentLayerBuilder
+    implements SuperReaderDocumentLayerBuilder {
   const _SelectionLeadersDocumentLayerBuilder({
     required this.links,
     // ignore: unused_element
@@ -617,7 +633,8 @@ class _SelectionLeadersDocumentLayerBuilder implements SuperReaderDocumentLayerB
   final bool showDebugLeaderBounds;
 
   @override
-  ContentLayerWidget build(BuildContext context, SuperReaderContext readerContext) {
+  ContentLayerWidget build(
+      BuildContext context, SuperReaderContext readerContext) {
     return SelectionLeadersDocumentLayer(
       document: readerContext.document,
       selection: readerContext.selection,
@@ -630,7 +647,8 @@ class _SelectionLeadersDocumentLayerBuilder implements SuperReaderDocumentLayerB
 /// A [SuperReaderDocumentLayerBuilder] that builds a [IosToolbarFocalPointDocumentLayer], which
 /// positions a `Leader` widget around the document selection, as a focal point for an
 /// iOS floating toolbar.
-class SuperReaderIosToolbarFocalPointDocumentLayerBuilder implements SuperReaderDocumentLayerBuilder {
+class SuperReaderIosToolbarFocalPointDocumentLayerBuilder
+    implements SuperReaderDocumentLayerBuilder {
   const SuperReaderIosToolbarFocalPointDocumentLayerBuilder({
     // ignore: unused_element
     this.showDebugLeaderBounds = false,
@@ -640,11 +658,13 @@ class SuperReaderIosToolbarFocalPointDocumentLayerBuilder implements SuperReader
   final bool showDebugLeaderBounds;
 
   @override
-  ContentLayerWidget build(BuildContext context, SuperReaderContext readerContext) {
+  ContentLayerWidget build(
+      BuildContext context, SuperReaderContext readerContext) {
     return IosToolbarFocalPointDocumentLayer(
       document: readerContext.document,
       selection: readerContext.selection,
-      toolbarFocalPointLink: SuperReaderIosControlsScope.rootOf(context).toolbarFocalPoint,
+      toolbarFocalPointLink:
+          SuperReaderIosControlsScope.rootOf(context).toolbarFocalPoint,
       showDebugLeaderBounds: showDebugLeaderBounds,
     );
   }
@@ -653,12 +673,15 @@ class SuperReaderIosToolbarFocalPointDocumentLayerBuilder implements SuperReader
 /// Builds widgets that are displayed at the same position and size as
 /// the document layout within a [SuperReader].
 abstract class SuperReaderDocumentLayerBuilder {
-  ContentLayerWidget build(BuildContext context, SuperReaderContext documentContext);
+  ContentLayerWidget build(
+      BuildContext context, SuperReaderContext documentContext);
 }
 
-typedef SuperReaderContentTapDelegateFactory = ContentTapDelegate Function(SuperReaderContext editContext);
+typedef SuperReaderContentTapDelegateFactory = ContentTapDelegate Function(
+    SuperReaderContext editContext);
 
-SuperReaderLaunchLinkTapHandler superReaderLaunchLinkTapHandlerFactory(SuperReaderContext readerContext) =>
+SuperReaderLaunchLinkTapHandler superReaderLaunchLinkTapHandlerFactory(
+        SuperReaderContext readerContext) =>
     SuperReaderLaunchLinkTapHandler(readerContext.document);
 
 /// A [ContentTapDelegate] that opens links when the user taps text with
@@ -695,12 +718,13 @@ class SuperReaderLaunchLinkTapHandler extends ContentTapDelegate {
 
     final textNode = document.getNodeById(position.nodeId);
     if (textNode is! TextNode) {
-      readerGesturesLog
-          .shout("Received a report of a tap on a TextNodePosition, but the node with that ID is a: $textNode");
+      readerGesturesLog.shout(
+          "Received a report of a tap on a TextNodePosition, but the node with that ID is a: $textNode");
       return null;
     }
 
-    final tappedAttributions = textNode.text.getAllAttributionsAt(nodePosition.offset);
+    final tappedAttributions =
+        textNode.text.getAllAttributionsAt(nodePosition.offset);
     for (final tappedAttribution in tappedAttributions) {
       if (tappedAttribution is LinkAttribution) {
         return tappedAttribution.uri;
@@ -788,6 +812,14 @@ final readOnlyDefaultStylesheet = Stylesheet(
       },
     ),
     StyleRule(
+      const BlockSelector("blockquote"),
+      (doc, docNode) {
+        return {
+          Styles.padding: const CascadingPadding.only(top: 8),
+        };
+      },
+    ),
+    StyleRule(
       const BlockSelector("paragraph").after("header1"),
       (doc, docNode) {
         return {
@@ -820,19 +852,6 @@ final readOnlyDefaultStylesheet = Stylesheet(
       },
     ),
     StyleRule(
-      const BlockSelector("blockquote"),
-      (doc, docNode) {
-        return {
-          Styles.textStyle: const TextStyle(
-            color: Colors.grey,
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            height: 1.4,
-          ),
-        };
-      },
-    ),
-    StyleRule(
       BlockSelector.all.last(),
       (doc, docNode) {
         return {
@@ -844,7 +863,8 @@ final readOnlyDefaultStylesheet = Stylesheet(
   inlineTextStyler: readOnlyDefaultInlineTextStyler,
 );
 
-TextStyle readOnlyDefaultInlineTextStyler(Set<Attribution> attributions, TextStyle existingStyle) {
+TextStyle readOnlyDefaultInlineTextStyler(
+    Set<Attribution> attributions, TextStyle existingStyle) {
   return existingStyle.merge(readOnlyDefaultStyleBuilder(attributions));
 }
 
@@ -865,13 +885,15 @@ TextStyle readOnlyDefaultStyleBuilder(Set<Attribution> attributions) {
       newStyle = newStyle.copyWith(
         decoration: newStyle.decoration == null
             ? TextDecoration.underline
-            : TextDecoration.combine([TextDecoration.underline, newStyle.decoration!]),
+            : TextDecoration.combine(
+                [TextDecoration.underline, newStyle.decoration!]),
       );
     } else if (attribution == strikethroughAttribution) {
       newStyle = newStyle.copyWith(
         decoration: newStyle.decoration == null
             ? TextDecoration.lineThrough
-            : TextDecoration.combine([TextDecoration.lineThrough, newStyle.decoration!]),
+            : TextDecoration.combine(
+                [TextDecoration.lineThrough, newStyle.decoration!]),
       );
     } else if (attribution is ColorAttribution) {
       newStyle = newStyle.copyWith(

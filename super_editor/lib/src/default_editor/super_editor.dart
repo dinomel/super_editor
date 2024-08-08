@@ -1466,6 +1466,14 @@ final defaultStylesheet = Stylesheet(
       },
     ),
     StyleRule(
+      const BlockSelector("blockquote"),
+      (doc, docNode) {
+        return {
+          Styles.padding: const CascadingPadding.only(top: 8),
+        };
+      },
+    ),
+    StyleRule(
       const BlockSelector("paragraph").after("header1"),
       (doc, docNode) {
         return {
@@ -1494,19 +1502,6 @@ final defaultStylesheet = Stylesheet(
       (doc, docNode) {
         return {
           Styles.padding: const CascadingPadding.only(top: 8),
-        };
-      },
-    ),
-    StyleRule(
-      const BlockSelector("blockquote"),
-      (doc, docNode) {
-        return {
-          Styles.textStyle: const TextStyle(
-            color: Colors.grey,
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            height: 1.4,
-          ),
         };
       },
     ),
