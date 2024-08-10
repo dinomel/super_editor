@@ -1401,7 +1401,7 @@ final defaultStylesheet = Stylesheet(
       BlockSelector.all,
       (doc, docNode) {
         return {
-          Styles.maxWidth: 640.0,
+          // Styles.maxWidth: 640.0,
           Styles.textStyle: const TextStyle(
             color: Colors.black,
             fontSize: 18,
