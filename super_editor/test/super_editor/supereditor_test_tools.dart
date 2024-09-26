@@ -948,6 +948,7 @@ class ExpandingTaskComponentBuilder extends ComponentBuilder {
       nodeId: node.id,
       padding: EdgeInsets.zero,
       isComplete: node.isComplete,
+      activeColor: node.activeColor,
       setComplete: (bool isComplete) {},
       text: node.text,
       textStyleBuilder: noStyleBuilder,

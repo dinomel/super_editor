@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:super_editor/src/default_editor/extensions.dart';
 import 'package:super_editor/super_editor.dart';
 import 'package:provider/provider.dart';
 import 'package:super_editor/src/default_editor/editor_notifier.dart';
@@ -24,6 +25,7 @@ class TaskNode extends TextNode {
     required AttributedText text,
     Map<String, dynamic>? metadata,
     required bool isComplete,
+    this.activeColor,
   })  : _isComplete = isComplete,
         super(id: id, text: text, metadata: metadata) {
     // Set a block type so that TaskNode's can be styled by
@@ -34,6 +36,7 @@ class TaskNode extends TextNode {
   /// Whether this task is complete.
   bool get isComplete => _isComplete;
   bool _isComplete;
+  Color? activeColor;
 
   set isComplete(bool newValue) {
     if (newValue == _isComplete) {
@@ -53,6 +56,7 @@ class TaskNode extends TextNode {
           'spans': text.spans.markers.map((e) => e.toJson()).toList(),
         },
         'isComplete': isComplete,
+        'activeColor': activeColor?.toHexString,
       };
 
   factory TaskNode.fromJson(Map<String, dynamic> json) {
@@ -60,6 +64,7 @@ class TaskNode extends TextNode {
       id: json['id'],
       text: DocumentNode.getAttributedTextFromJson(json['text']),
       isComplete: json['isComplete'],
+      activeColor: (json["activeColor"] as String?)?.colorFromHex,
     );
   }
 
@@ -116,6 +121,7 @@ class TaskComponentBuilder implements ComponentBuilder {
       nodeId: node.id,
       padding: EdgeInsets.zero,
       isComplete: node.isComplete,
+      activeColor: node.activeColor,
       setComplete: (bool isComplete) {
         _editor?.execute([
           ChangeTaskCompletionRequest(
@@ -157,6 +163,7 @@ class TaskComponentViewModel extends SingleColumnLayoutComponentViewModel
     double? maxWidth,
     required EdgeInsetsGeometry padding,
     required this.isComplete,
+    required this.activeColor,
     required this.setComplete,
     required this.text,
     required this.textStyleBuilder,
@@ -170,6 +177,7 @@ class TaskComponentViewModel extends SingleColumnLayoutComponentViewModel
   }) : super(nodeId: nodeId, maxWidth: maxWidth, padding: padding);
 
   bool isComplete;
+  Color? activeColor;
   void Function(bool) setComplete;
 
   @override
@@ -198,6 +206,7 @@ class TaskComponentViewModel extends SingleColumnLayoutComponentViewModel
       maxWidth: maxWidth,
       padding: padding,
       isComplete: isComplete,
+      activeColor: activeColor,
       setComplete: setComplete,
       text: text,
       textStyleBuilder: textStyleBuilder,
@@ -303,6 +312,7 @@ class _TaskComponentState extends State<TaskComponent>
             child: Transform.scale(
               scale: 1.2,
               child: Checkbox(
+                activeColor: widget.viewModel.activeColor,
                 shape: const CircleBorder(),
                 value: widget.viewModel.isComplete,
                 onChanged: (newValue) {
