@@ -50,7 +50,8 @@ final defaultRequestHandlers = List.unmodifiable(<EditRequestHandler>[
       ? ChangeComposingRegionCommand(null)
       : null,
   (request) => request is ChangeInteractionModeRequest //
-      ? ChangeInteractionModeCommand(isInteractionModeDesired: request.isInteractionModeDesired)
+      ? ChangeInteractionModeCommand(
+          isInteractionModeDesired: request.isInteractionModeDesired)
       : null,
   (request) => request is InsertTextRequest
       ? InsertTextCommand(
@@ -72,13 +73,16 @@ final defaultRequestHandlers = List.unmodifiable(<EditRequestHandler>[
         )
       : null,
   (request) => request is InsertNodeAtIndexRequest
-      ? InsertNodeAtIndexCommand(nodeIndex: request.nodeIndex, newNode: request.newNode)
+      ? InsertNodeAtIndexCommand(
+          nodeIndex: request.nodeIndex, newNode: request.newNode)
       : null,
   (request) => request is InsertNodeBeforeNodeRequest
-      ? InsertNodeBeforeNodeCommand(existingNodeId: request.existingNodeId, newNode: request.newNode)
+      ? InsertNodeBeforeNodeCommand(
+          existingNodeId: request.existingNodeId, newNode: request.newNode)
       : null,
   (request) => request is InsertNodeAfterNodeRequest
-      ? InsertNodeAfterNodeCommand(existingNodeId: request.existingNodeId, newNode: request.newNode)
+      ? InsertNodeAfterNodeCommand(
+          existingNodeId: request.existingNodeId, newNode: request.newNode)
       : null,
   (request) => request is InsertNodeAtCaretRequest //
       ? InsertNodeAtCaretCommand(newNode: request.node)
@@ -87,10 +91,12 @@ final defaultRequestHandlers = List.unmodifiable(<EditRequestHandler>[
       ? MoveNodeCommand(nodeId: request.nodeId, newIndex: request.newIndex)
       : null,
   (request) => request is CombineParagraphsRequest
-      ? CombineParagraphsCommand(firstNodeId: request.firstNodeId, secondNodeId: request.secondNodeId)
+      ? CombineParagraphsCommand(
+          firstNodeId: request.firstNodeId, secondNodeId: request.secondNodeId)
       : null,
   (request) => request is ReplaceNodeRequest
-      ? ReplaceNodeCommand(existingNodeId: request.existingNodeId, newNode: request.newNode)
+      ? ReplaceNodeCommand(
+          existingNodeId: request.existingNodeId, newNode: request.newNode)
       : null,
   (request) => request is ReplaceNodeWithEmptyParagraphWithCaretRequest
       ? ReplaceNodeWithEmptyParagraphWithCaretCommand(nodeId: request.nodeId)
@@ -98,13 +104,17 @@ final defaultRequestHandlers = List.unmodifiable(<EditRequestHandler>[
   (request) => request is DeleteContentRequest //
       ? DeleteContentCommand(documentRange: request.documentRange)
       : null,
-  (request) => request is DeleteUpstreamAtBeginningOfNodeRequest && request.node is ListItemNode
-      ? ConvertListItemToParagraphCommand(nodeId: request.node.id, paragraphMetadata: request.node.metadata)
+  (request) => request is DeleteUpstreamAtBeginningOfNodeRequest &&
+          request.node is ListItemNode
+      ? ConvertListItemToParagraphCommand(
+          nodeId: request.node.id, paragraphMetadata: request.node.metadata)
       : null,
-  (request) => request is DeleteUpstreamAtBeginningOfNodeRequest && request.node is ParagraphNode
+  (request) => request is DeleteUpstreamAtBeginningOfNodeRequest &&
+          request.node is ParagraphNode
       ? DeleteUpstreamAtBeginningOfParagraphCommand(request.node)
       : null,
-  (request) => request is DeleteUpstreamAtBeginningOfNodeRequest && request.node is BlockNode
+  (request) => request is DeleteUpstreamAtBeginningOfNodeRequest &&
+          request.node is BlockNode
       ? DeleteUpstreamAtBeginningOfBlockNodeCommand(request.node)
       : null,
   (request) => request is DeleteNodeRequest //
@@ -146,17 +156,21 @@ final defaultRequestHandlers = List.unmodifiable(<EditRequestHandler>[
           splitPosition: request.splitPosition,
           newNodeId: request.newNodeId,
           replicateExistingMetadata: request.replicateExistingMetadata,
-          attributionsToExtendToNewParagraph: request.attributionsToExtendToNewParagraph,
+          attributionsToExtendToNewParagraph:
+              request.attributionsToExtendToNewParagraph,
         )
       : null,
   (request) => request is ConvertParagraphToTaskRequest
       ? ConvertParagraphToTaskCommand(
           nodeId: request.nodeId,
           isComplete: request.isComplete,
+          activeColor: request.activeColor,
         )
       : null,
-  (request) => request is DeleteUpstreamAtBeginningOfNodeRequest && request.node is TaskNode
-      ? ConvertTaskToParagraphCommand(nodeId: request.node.id, paragraphMetadata: request.node.metadata)
+  (request) => request is DeleteUpstreamAtBeginningOfNodeRequest &&
+          request.node is TaskNode
+      ? ConvertTaskToParagraphCommand(
+          nodeId: request.node.id, paragraphMetadata: request.node.metadata)
       : null,
   (request) => request is ChangeTaskCompletionRequest
       ? ChangeTaskCompletionCommand(
@@ -185,13 +199,16 @@ final defaultRequestHandlers = List.unmodifiable(<EditRequestHandler>[
       ? UnIndentListItemCommand(nodeId: request.nodeId)
       : null,
   (request) => request is ChangeListItemTypeRequest
-      ? ChangeListItemTypeCommand(nodeId: request.nodeId, newType: request.newType)
+      ? ChangeListItemTypeCommand(
+          nodeId: request.nodeId, newType: request.newType)
       : null,
   (request) => request is ConvertListItemToParagraphRequest //
-      ? ConvertListItemToParagraphCommand(nodeId: request.nodeId, paragraphMetadata: request.paragraphMetadata)
+      ? ConvertListItemToParagraphCommand(
+          nodeId: request.nodeId, paragraphMetadata: request.paragraphMetadata)
       : null,
   (request) => request is ConvertParagraphToListItemRequest
-      ? ConvertParagraphToListItemCommand(nodeId: request.nodeId, type: request.type)
+      ? ConvertParagraphToListItemCommand(
+          nodeId: request.nodeId, type: request.type)
       : null,
   (request) => request is AddTextAttributionsRequest
       ? AddTextAttributionsCommand(
@@ -201,16 +218,22 @@ final defaultRequestHandlers = List.unmodifiable(<EditRequestHandler>[
         )
       : null,
   (request) => request is ToggleTextAttributionsRequest
-      ? ToggleTextAttributionsCommand(documentRange: request.documentRange, attributions: request.attributions)
+      ? ToggleTextAttributionsCommand(
+          documentRange: request.documentRange,
+          attributions: request.attributions)
       : null,
   (request) => request is RemoveTextAttributionsRequest
-      ? RemoveTextAttributionsCommand(documentRange: request.documentRange, attributions: request.attributions)
+      ? RemoveTextAttributionsCommand(
+          documentRange: request.documentRange,
+          attributions: request.attributions)
       : null,
   (request) => request is ChangeSingleColumnLayoutComponentStylesRequest
-      ? ChangeSingleColumnLayoutComponentStylesCommand(nodeId: request.nodeId, styles: request.styles) //
+      ? ChangeSingleColumnLayoutComponentStylesCommand(
+          nodeId: request.nodeId, styles: request.styles) //
       : null,
   (request) => request is ConvertTextNodeToParagraphRequest
-      ? ConvertTextNodeToParagraphCommand(nodeId: request.nodeId, newMetadata: request.newMetadata)
+      ? ConvertTextNodeToParagraphCommand(
+          nodeId: request.nodeId, newMetadata: request.newMetadata)
       : null,
   (request) => request is PasteEditorRequest
       ? PasteEditorCommand(

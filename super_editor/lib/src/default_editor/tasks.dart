@@ -472,10 +472,12 @@ class ConvertParagraphToTaskRequest implements EditRequest {
   const ConvertParagraphToTaskRequest({
     required this.nodeId,
     this.isComplete = false,
+    this.activeColor,
   });
 
   final String nodeId;
   final bool isComplete;
+  final Color? activeColor;
 
   @override
   bool operator ==(Object other) =>
@@ -493,10 +495,12 @@ class ConvertParagraphToTaskCommand implements EditCommand {
   const ConvertParagraphToTaskCommand({
     required this.nodeId,
     this.isComplete = false,
+    this.activeColor,
   });
 
   final String nodeId;
   final bool isComplete;
+  final Color? activeColor;
 
   @override
   void execute(EditContext context, CommandExecutor executor) {
@@ -512,6 +516,7 @@ class ConvertParagraphToTaskCommand implements EditCommand {
       id: existingNode.id,
       text: existingNode.text,
       isComplete: false,
+      activeColor: activeColor,
     );
 
     executor.executeCommand(
@@ -602,6 +607,7 @@ class SplitExistingTaskCommand implements EditCommand {
       id: newNodeId ?? Editor.createNodeId(),
       text: node.text.copyText(splitOffset),
       isComplete: false,
+      activeColor: node.activeColor,
     );
 
     // Remove the text after the caret from the currently selected TaskNode.
