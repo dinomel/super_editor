@@ -720,7 +720,6 @@ class MutableDocument implements Document, Editable {
   /// Deletes the node at the given [index].
   void deleteNodeAt(int index) {
     if (index >= 0 && index < _nodes.length) {
-      _nodes.removeAt(index + 1);
       _nodes.removeAt(index);
       _refreshNodeIdCaches();
     } else {
@@ -728,17 +727,27 @@ class MutableDocument implements Document, Editable {
     }
   }
 
+  void deleteDuplicateDragIndicators() {
+    if (_nodes.isEmpty) return;
+    DocumentNode prevNode = _nodes[0];
+    final indexes = [];
+    for (int i = 1; i < _nodes.length; i++) {
+      if (prevNode is DragIndicatorNode && _nodes[i] is DragIndicatorNode) {
+        indexes.add(i);
+      }
+      prevNode = _nodes[i];
+    }
+    for (int i in indexes.reversed) {
+      deleteNodeAt(i);
+    }
+  }
+
   /// Deletes the given [node] from the [Document].
   bool deleteNode(DocumentNode node) {
     bool isRemoved = false;
-
-    final dragNode = getDragIndicatorNodeAfter(node);
-    if (dragNode is DragIndicatorNode) {
-      _nodes.remove(dragNode);
-    }
-    _nodes.remove(dragNode);
     isRemoved = _nodes.remove(node);
     if (isRemoved) {
+      deleteDuplicateDragIndicators();
       _refreshNodeIdCaches();
     }
 

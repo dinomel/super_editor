@@ -47,25 +47,34 @@ class PasteStructuredContentEditorCommand implements EditCommand {
 
     final document = context.find<MutableDocument>(Editor.documentKey);
     final composer = context.find<MutableDocumentComposer>(Editor.composerKey);
-    final currentNodeWithSelection = document.getNodeById(_pastePosition.nodeId);
+    final currentNodeWithSelection =
+        document.getNodeById(_pastePosition.nodeId);
     if (currentNodeWithSelection is! TextNode) {
-      throw Exception('Can\'t handle pasting text within node of type: $currentNodeWithSelection');
+      throw Exception(
+          'Can\'t handle pasting text within node of type: $currentNodeWithSelection');
     }
 
     editorOpsLog.info("Pasting clipboard content as Markdown in document.");
 
     if (_content.length == 1) {
-      _pasteSingleNode(executor, document, _content.first, _pastePosition, currentNodeWithSelection);
+      _pasteSingleNode(executor, document, _content.first, _pastePosition,
+          currentNodeWithSelection);
     } else {
-      _pasteMultipleNodes(executor, document, _content, currentNodeWithSelection);
+      _pasteMultipleNodes(
+          executor, document, _content, currentNodeWithSelection);
     }
 
-    editorOpsLog.fine('New selection after paste operation: ${composer.selection}');
+    editorOpsLog
+        .fine('New selection after paste operation: ${composer.selection}');
     editorOpsLog.fine('Done with paste command.');
   }
 
-  void _pasteSingleNode(CommandExecutor executor, MutableDocument document, DocumentNode pastedNode,
-      DocumentPosition pastePosition, TextNode currentNodeWithSelection) {
+  void _pasteSingleNode(
+      CommandExecutor executor,
+      MutableDocument document,
+      DocumentNode pastedNode,
+      DocumentPosition pastePosition,
+      TextNode currentNodeWithSelection) {
     if (_canMergeNodes(currentNodeWithSelection, pastedNode)) {
       executor.executeCommand(
         InsertAttributedTextCommand(
@@ -80,7 +89,9 @@ class PasteStructuredContentEditorCommand implements EditCommand {
     }
 
     final (upstreamNodeId, _) = _splitPasteParagraph(
-        executor, currentNodeWithSelection.id, (pastePosition.nodePosition as TextNodePosition).offset);
+        executor,
+        currentNodeWithSelection.id,
+        (pastePosition.nodePosition as TextNodePosition).offset);
 
     // Insert the pasted node after the split upstream node.
     document.insertNodeAfter(
@@ -89,7 +100,8 @@ class PasteStructuredContentEditorCommand implements EditCommand {
     );
     executor.logChanges([
       DocumentEdit(
-        NodeInsertedEvent(pastedNode.id, document.getNodeIndexById(pastedNode.id)),
+        NodeInsertedEvent(
+            pastedNode.id, document.getNodeIndexById(pastedNode.id)),
       )
     ]);
 
@@ -115,7 +127,8 @@ class PasteStructuredContentEditorCommand implements EditCommand {
     TextNode currentNodeWithSelection,
   ) {
     final textNode = document.getNode(_pastePosition) as TextNode;
-    final pasteTextOffset = (_pastePosition.nodePosition as TextPosition).offset;
+    final pasteTextOffset =
+        (_pastePosition.nodePosition as TextPosition).offset;
     final nodesToInsert = List.from(_content);
 
     // Split the original node in two, around the caret.
@@ -123,8 +136,10 @@ class PasteStructuredContentEditorCommand implements EditCommand {
     if (pasteTextOffset < textNode.endPosition.offset) {
       // The caret sits somewhere in the middle of an existing text node. Split the
       // node at the caret so we can paste structured content in between.
-      final (_, downstreamSplitNodeId) = _splitPasteParagraph(executor, currentNodeWithSelection.id, pasteTextOffset);
-      downstreamSplitNode = document.getNodeById(downstreamSplitNodeId) as TextNode;
+      final (_, downstreamSplitNodeId) = _splitPasteParagraph(
+          executor, currentNodeWithSelection.id, pasteTextOffset);
+      downstreamSplitNode =
+          document.getNodeById(downstreamSplitNodeId) as TextNode;
     }
 
     // (Possibly) merge or delete the upstream split node.
@@ -156,7 +171,8 @@ class PasteStructuredContentEditorCommand implements EditCommand {
     // (Possibly) merge or delete the downstream split node.
     if (nodesToInsert.isNotEmpty) {
       final lastPastedNode = nodesToInsert.last;
-      if (downstreamSplitNode != null && _canMergeNodes(lastPastedNode, downstreamSplitNode)) {
+      if (downstreamSplitNode != null &&
+          _canMergeNodes(lastPastedNode, downstreamSplitNode)) {
         // The text in the last pasted node is stylistically compatible with the
         // existing text in the node that was split after the caret. Therefore, instead
         // of inserting the last pasted node, merge its content with the existing split
@@ -190,7 +206,8 @@ class PasteStructuredContentEditorCommand implements EditCommand {
 
       executor.logChanges([
         DocumentEdit(
-          NodeInsertedEvent(pastedNode.id, document.getNodeIndexById(pastedNode.id)),
+          NodeInsertedEvent(
+              pastedNode.id, document.getNodeIndexById(pastedNode.id)),
         )
       ]);
     }
@@ -199,7 +216,8 @@ class PasteStructuredContentEditorCommand implements EditCommand {
       document.deleteNode(currentNodeWithSelection);
       executor.logChanges([
         DocumentEdit(
-          NodeRemovedEvent(currentNodeWithSelection.id, currentNodeWithSelection),
+          NodeRemovedEvent(
+              currentNodeWithSelection.id, currentNodeWithSelection),
         )
       ]);
     }
@@ -382,7 +400,8 @@ class InsertNodeAtCaretCommand extends EditCommand {
       return;
     }
 
-    final paragraphPosition = composer.selection!.extent.nodePosition as TextNodePosition;
+    final paragraphPosition =
+        composer.selection!.extent.nodePosition as TextNodePosition;
     final beginningOfParagraph = selectedNode.beginningPosition;
     final endOfParagraph = selectedNode.endPosition;
 
@@ -404,7 +423,8 @@ class InsertNodeAtCaretCommand extends EditCommand {
       );
     } else if (paragraphPosition.offset == beginningOfParagraph.offset) {
       // Insert block item after the paragraph.
-      document.insertNodeAt(document.getNodeIndexById(selectedNode.id), newNode);
+      document.insertNodeAt(
+          document.getNodeIndexById(selectedNode.id), newNode);
       executor.logChanges([
         DocumentEdit(
           NodeInsertedEvent(newNode.id, document.getNodeIndexById(newNode.id)),
@@ -418,7 +438,8 @@ class InsertNodeAtCaretCommand extends EditCommand {
         ),
       );
     } else if (paragraphPosition.offset == endOfParagraph.offset) {
-      final emptyParagraph = ParagraphNode(id: Editor.createNodeId(), text: AttributedText());
+      final emptyParagraph =
+          ParagraphNode(id: Editor.createNodeId(), text: AttributedText());
 
       // Insert block item after the paragraph and insert a new empty paragraph.
       document
@@ -429,7 +450,8 @@ class InsertNodeAtCaretCommand extends EditCommand {
           NodeInsertedEvent(newNode.id, document.getNodeIndexById(newNode.id)),
         ),
         DocumentEdit(
-          NodeInsertedEvent(emptyParagraph.id, document.getNodeIndexById(emptyParagraph.id)),
+          NodeInsertedEvent(
+              emptyParagraph.id, document.getNodeIndexById(emptyParagraph.id)),
         ),
       ]);
 
@@ -441,10 +463,12 @@ class InsertNodeAtCaretCommand extends EditCommand {
       );
     } else {
       // Split the paragraph and inset image in between.
-      final textBefore = selectedNode.text.copyText(0, paragraphPosition.offset);
+      final textBefore =
+          selectedNode.text.copyText(0, paragraphPosition.offset);
       final textAfter = selectedNode.text.copyText(paragraphPosition.offset);
 
-      final newParagraph = ParagraphNode(id: Editor.createNodeId(), text: textAfter);
+      final newParagraph =
+          ParagraphNode(id: Editor.createNodeId(), text: textAfter);
 
       selectedNode.text = textBefore;
       document
@@ -458,7 +482,8 @@ class InsertNodeAtCaretCommand extends EditCommand {
           NodeInsertedEvent(newNode.id, document.getNodeIndexById(newNode.id)),
         ),
         DocumentEdit(
-          NodeInsertedEvent(newParagraph.id, document.getNodeIndexById(newParagraph.id)),
+          NodeInsertedEvent(
+              newParagraph.id, document.getNodeIndexById(newParagraph.id)),
         ),
       ]);
 
@@ -533,7 +558,10 @@ class MoveNodeCommand extends EditCommand {
       // the target node. Report its change of index.
       nodeMoveEvents.add(
         DocumentEdit(
-          NodeMovedEvent(nodeId: document.getNodeAt(i)!.id, from: i, to: i - otherNodeMovementDirection),
+          NodeMovedEvent(
+              nodeId: document.getNodeAt(i)!.id,
+              from: i,
+              to: i - otherNodeMovementDirection),
         ),
       );
     }
@@ -662,9 +690,11 @@ class DeleteContentCommand implements EditCommand {
 
   @override
   void execute(EditContext context, CommandExecutor executor) {
-    _log.log('DeleteSelectionCommand', 'DocumentEditor: deleting selection: $documentRange');
+    _log.log('DeleteSelectionCommand',
+        'DocumentEditor: deleting selection: $documentRange');
     final document = context.find<MutableDocument>(Editor.documentKey);
-    final nodes = document.getNodesInside(documentRange.start, documentRange.end);
+    final nodes =
+        document.getNodesInside(documentRange.start, documentRange.end);
     final normalizedRange = documentRange.normalize(document);
 
     if (nodes.length == 1) {
@@ -681,13 +711,15 @@ class DeleteContentCommand implements EditCommand {
 
     final startNode = document.getNode(normalizedRange.start);
     if (startNode == null) {
-      throw Exception('Could not locate start node for DeleteSelectionCommand: ${normalizedRange.start}');
+      throw Exception(
+          'Could not locate start node for DeleteSelectionCommand: ${normalizedRange.start}');
     }
     final startNodeIndex = document.getNodeIndexById(startNode.id);
 
     final endNode = document.getNode(normalizedRange.end);
     if (endNode == null) {
-      throw Exception('Could not locate end node for DeleteSelectionCommand: ${normalizedRange.end}');
+      throw Exception(
+          'Could not locate end node for DeleteSelectionCommand: ${normalizedRange.end}');
     }
     final endNodeIndex = document.getNodeIndexById(endNode.id);
 
@@ -699,7 +731,8 @@ class DeleteContentCommand implements EditCommand {
       ),
     );
 
-    _log.log('DeleteSelectionCommand', ' - deleting partial selection within the starting node.');
+    _log.log('DeleteSelectionCommand',
+        ' - deleting partial selection within the starting node.');
     executor.logChanges(
       _deleteRangeWithinNodeFromPositionToEnd(
         document: document,
@@ -709,7 +742,8 @@ class DeleteContentCommand implements EditCommand {
       ),
     );
 
-    _log.log('DeleteSelectionCommand', ' - deleting partial selection within ending node.');
+    _log.log('DeleteSelectionCommand',
+        ' - deleting partial selection within ending node.');
     executor.logChanges(
       _deleteRangeWithinNodeFromStartToPosition(
         document: document,
@@ -722,7 +756,8 @@ class DeleteContentCommand implements EditCommand {
     // the beginning of the first node to the end of the last node, then
     // we need insert an empty paragraph node so that there's a place
     // to position the caret.
-    if (document.getNodeById(startNode.id) == null && document.getNodeById(endNode.id) == null) {
+    if (document.getNodeById(startNode.id) == null &&
+        document.getNodeById(endNode.id) == null) {
       final insertIndex = min(startNodeIndex, endNodeIndex);
       document.insertNodeAt(
         insertIndex,
@@ -744,13 +779,15 @@ class DeleteContentCommand implements EditCommand {
     // If the start node and end nodes are both `TextNode`s
     // then we need to consider merging them if one or both are
     // empty.
-    if (startNodeAfterDeletion is! TextNode || endNodeAfterDeletion is! TextNode) {
+    if (startNodeAfterDeletion is! TextNode ||
+        endNodeAfterDeletion is! TextNode) {
       // Neither of the end nodes are `TextNode`s, so there's nothing
       // for us to merge. We're done.
       return;
     }
 
-    _log.log('DeleteSelectionCommand', ' - combining last node text with first node text');
+    _log.log('DeleteSelectionCommand',
+        ' - combining last node text with first node text');
     executor.logChanges([
       DocumentEdit(
         TextInsertionEvent(
@@ -760,7 +797,8 @@ class DeleteContentCommand implements EditCommand {
         ),
       ),
     ]);
-    startNodeAfterDeletion.text = startNodeAfterDeletion.text.copyAndAppend(endNodeAfterDeletion.text);
+    startNodeAfterDeletion.text =
+        startNodeAfterDeletion.text.copyAndAppend(endNodeAfterDeletion.text);
 
     _log.log('DeleteSelectionCommand', ' - deleting last node');
     document.deleteNode(endNodeAfterDeletion);
@@ -777,7 +815,8 @@ class DeleteContentCommand implements EditCommand {
     required DocumentRange normalizedRange,
     required DocumentNode node,
   }) {
-    _log.log('_deleteSelectionWithinSingleNode', ' - deleting selection within single node');
+    _log.log('_deleteSelectionWithinSingleNode',
+        ' - deleting selection within single node');
     final startPosition = normalizedRange.start.nodePosition;
     final endPosition = normalizedRange.end.nodePosition;
 
@@ -804,7 +843,8 @@ class DeleteContentCommand implements EditCommand {
       _log.log('_deleteSelectionWithinSingleNode', ' - its a TextNode');
       final startOffset = (startPosition as TextPosition).offset;
       final endOffset = (endPosition as TextPosition).offset;
-      _log.log('_deleteSelectionWithinSingleNode', ' - deleting from $startOffset to $endOffset');
+      _log.log('_deleteSelectionWithinSingleNode',
+          ' - deleting from $startOffset to $endOffset');
 
       final deletedText = node.text.copyText(startOffset, endOffset);
       node.text = node.text.removeRegion(
@@ -835,21 +875,25 @@ class DeleteContentCommand implements EditCommand {
     final startIndex = document.getNodeIndexById(startNode.id);
     final endIndex = document.getNodeIndexById(endNode.id);
 
-    _log.log('_deleteNodesBetweenFirstAndLast', ' - start node index: $startIndex');
+    _log.log(
+        '_deleteNodesBetweenFirstAndLast', ' - start node index: $startIndex');
     _log.log('_deleteNodesBetweenFirstAndLast', ' - end node index: $endIndex');
-    _log.log('_deleteNodesBetweenFirstAndLast', ' - initially ${document.nodes.length} nodes');
+    _log.log('_deleteNodesBetweenFirstAndLast',
+        ' - initially ${document.nodes.length} nodes');
 
     // Remove nodes from last to first so that indices don't get
     // screwed up during removal.
     final changes = <EditEvent>[];
     for (int i = endIndex - 1; i > startIndex; --i) {
-      _log.log('_deleteNodesBetweenFirstAndLast', ' - deleting node $i: ${document.getNodeAt(i)?.id}');
+      _log.log('_deleteNodesBetweenFirstAndLast',
+          ' - deleting node $i: ${document.getNodeAt(i)?.id}');
       final removedNode = document.getNodeAt(i)!;
       changes.add(DocumentEdit(
         NodeRemovedEvent(removedNode.id, removedNode),
       ));
       document.deleteNodeAt(i);
     }
+    document.deleteDuplicateDragIndicators();
     return changes;
   }
 
@@ -904,7 +948,8 @@ class DeleteContentCommand implements EditCommand {
         ];
       }
     } else {
-      throw Exception('Unknown node position type: $nodePosition, for node: $node');
+      throw Exception(
+          'Unknown node position type: $nodePosition, for node: $node');
     }
   }
 
@@ -958,7 +1003,8 @@ class DeleteContentCommand implements EditCommand {
         ];
       }
     } else {
-      throw Exception('Unknown node position type: $nodePosition, for node: $node');
+      throw Exception(
+          'Unknown node position type: $nodePosition, for node: $node');
     }
   }
 
@@ -978,7 +1024,8 @@ class DeleteContentCommand implements EditCommand {
       //       depending on the first node still existing at the end of
       //       the deletion. This is a fragile relationship between the
       //       composer and the editor and needs to be addressed.
-      _log.log('_deleteBlockNode', ' - replacing block-level node with a ParagraphNode: ${node.id}');
+      _log.log('_deleteBlockNode',
+          ' - replacing block-level node with a ParagraphNode: ${node.id}');
 
       final newNode = ParagraphNode(id: node.id, text: AttributedText());
       document.replaceNode(oldNode: node, newNode: newNode);
