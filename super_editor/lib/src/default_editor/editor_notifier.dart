@@ -19,6 +19,7 @@ class EditorNotifier extends ChangeNotifier {
   double? screenHeight;
   final double topPadding;
   final autoscrollCoefficient = 8;
+  String? lastSelectedNodeID;
 
   bool isDragNodeVisible(String nodeId) => dragNodeID == nodeId;
 
@@ -34,6 +35,9 @@ class EditorNotifier extends ChangeNotifier {
       composer: composer,
       documentLayoutResolver: () => docLayoutKey.currentState as DocumentLayout,
     );
+    composer.addListener(() {
+      lastSelectedNodeID = composer.selection?.base.nodeId;
+    });
   }
 
   @override
