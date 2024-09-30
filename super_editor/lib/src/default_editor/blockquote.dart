@@ -387,6 +387,7 @@ class SplitBlockquoteCommand implements EditCommand {
       existingNode: node,
       newNode: newNode,
     );
+    document.updateDragIndicators();
 
     executor.logChanges([
       DocumentEdit(

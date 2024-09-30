@@ -1115,6 +1115,7 @@ class SplitListItemCommand implements EditCommand {
       existingNode: node,
       newNode: newNode,
     );
+    document.updateDragIndicators();
 
     // Clear the composing region to avoid keeping a region pointing to the
     // node that was split.

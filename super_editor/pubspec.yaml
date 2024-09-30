@@ -27,7 +27,7 @@ dependencies:
   http: ">=0.13.1 <2.0.0"
   linkify: ^5.0.0
   logging: ^1.0.1
-  super_text_layout: ^0.1.10
+  super_text_layout: 0.1.10
   url_launcher: ^6.1.9
   uuid: ^4.0.0
   overlord: ^0.0.3+5
@@ -49,7 +49,7 @@ dependency_overrides:
     git:
       url: https://github.com/dinomel/super_editor
       path: attributed_text
-      ref: main
+      ref: tech387-main
 
 dev_dependencies:
   flutter_lints: ^2.0.1

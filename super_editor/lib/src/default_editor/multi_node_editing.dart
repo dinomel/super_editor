@@ -98,6 +98,7 @@ class PasteStructuredContentEditorCommand implements EditCommand {
       existingNode: document.getNodeById(upstreamNodeId)!,
       newNode: pastedNode,
     );
+    document.updateDragIndicators();
     executor.logChanges([
       DocumentEdit(
         NodeInsertedEvent(
@@ -202,6 +203,7 @@ class PasteStructuredContentEditorCommand implements EditCommand {
         existingNode: previousNode,
         newNode: pastedNode,
       );
+      document.updateDragIndicators();
       previousNode = pastedNode;
 
       executor.logChanges([
@@ -293,6 +295,7 @@ class InsertNodeAtIndexCommand extends EditCommand {
   void execute(EditContext context, CommandExecutor executor) {
     final document = context.find<MutableDocument>(Editor.documentKey);
     document.insertNodeAt(nodeIndex, newNode);
+    document.updateDragIndicators();
     executor.logChanges([
       DocumentEdit(
         NodeInsertedEvent(newNode.id, nodeIndex),
@@ -326,6 +329,8 @@ class InsertNodeBeforeNodeCommand extends EditCommand {
     final existingNode = document.getNodeById(existingNodeId)!;
     document.insertNodeBefore(existingNode: existingNode, newNode: newNode);
 
+    document.updateDragIndicators();
+
     executor.logChanges([
       DocumentEdit(
         NodeInsertedEvent(newNode.id, document.getNodeIndexById(newNode.id)),
@@ -358,6 +363,7 @@ class InsertNodeAfterNodeCommand extends EditCommand {
     final document = context.find<MutableDocument>(Editor.documentKey);
     final existingNode = document.getNodeById(existingNodeId)!;
     document.insertNodeAfter(existingNode: existingNode, newNode: newNode);
+    document.updateDragIndicators();
 
     executor.logChanges([
       DocumentEdit(
@@ -409,6 +415,8 @@ class InsertNodeAtCaretCommand extends EditCommand {
     if (selectedNode.text.text.isEmpty) {
       // Insert new block node above selected paragraph.
       document.insertNodeBefore(existingNode: selectedNode, newNode: newNode);
+
+      document.updateDragIndicators();
       executor.logChanges([
         DocumentEdit(
           NodeInsertedEvent(newNode.id, document.getNodeIndexById(newNode.id)),
@@ -425,6 +433,8 @@ class InsertNodeAtCaretCommand extends EditCommand {
       // Insert block item after the paragraph.
       document.insertNodeAt(
           document.getNodeIndexById(selectedNode.id), newNode);
+
+      document.updateDragIndicators();
       executor.logChanges([
         DocumentEdit(
           NodeInsertedEvent(newNode.id, document.getNodeIndexById(newNode.id)),
@@ -445,6 +455,7 @@ class InsertNodeAtCaretCommand extends EditCommand {
       document
         ..insertNodeAfter(existingNode: selectedNode, newNode: newNode)
         ..insertNodeAfter(existingNode: newNode, newNode: emptyParagraph);
+      document.updateDragIndicators();
       executor.logChanges([
         DocumentEdit(
           NodeInsertedEvent(newNode.id, document.getNodeIndexById(newNode.id)),
@@ -474,6 +485,8 @@ class InsertNodeAtCaretCommand extends EditCommand {
       document
         ..insertNodeAfter(existingNode: selectedNode, newNode: newNode)
         ..insertNodeAfter(existingNode: newNode, newNode: newParagraph);
+
+      document.updateDragIndicators();
       executor.logChanges([
         DocumentEdit(
           NodeChangeEvent(selectedNodeId),
@@ -763,6 +776,7 @@ class DeleteContentCommand implements EditCommand {
         insertIndex,
         ParagraphNode(id: startNode.id, text: AttributedText()),
       );
+      document.updateDragIndicators();
       executor.logChanges([
         DocumentEdit(
           NodeChangeEvent(startNode.id),
@@ -893,7 +907,7 @@ class DeleteContentCommand implements EditCommand {
       ));
       document.deleteNodeAt(i);
     }
-    document.deleteDuplicateDragIndicators();
+    document.updateDragIndicators();
     return changes;
   }
 

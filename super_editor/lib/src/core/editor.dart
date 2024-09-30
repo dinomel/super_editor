@@ -654,13 +654,6 @@ class MutableDocument implements Document, Editable {
   void insertNodeAt(int index, DocumentNode node) {
     if (index <= _nodes.length) {
       _nodes.insert(index, node);
-      _nodes.insert(
-        index,
-        DragIndicatorNode(
-          id: Editor.createNodeId(),
-          color: (_nodes.first as DragIndicatorNode).color,
-        ),
-      );
       _refreshNodeIdCaches();
     }
   }
@@ -672,13 +665,6 @@ class MutableDocument implements Document, Editable {
   }) {
     final nodeIndex = _nodes.indexOf(existingNode);
     _nodes.insert(nodeIndex, newNode);
-    _nodes.insert(
-      nodeIndex,
-      DragIndicatorNode(
-        id: Editor.createNodeId(),
-        color: (_nodes.first as DragIndicatorNode).color,
-      ),
-    );
     _refreshNodeIdCaches();
   }
 
@@ -690,31 +676,8 @@ class MutableDocument implements Document, Editable {
     final nodeIndex = _nodes.indexOf(existingNode);
     if (nodeIndex >= 0 && nodeIndex < _nodes.length) {
       _nodes.insert(nodeIndex + 1, newNode);
-      _nodes.insert(
-        nodeIndex + 1,
-        DragIndicatorNode(
-          id: Editor.createNodeId(),
-          color: (_nodes.first as DragIndicatorNode).color,
-        ),
-      );
       _refreshNodeIdCaches();
     }
-  }
-
-  /// Adds [node] to the end of the document.
-  void add(DocumentNode node) {
-    _nodes.insert(_nodes.length, node);
-
-    _nodes.insert(
-      _nodes.length,
-      DragIndicatorNode(
-        id: Editor.createNodeId(),
-        color: (_nodes.first as DragIndicatorNode).color,
-      ),
-    );
-
-    // The node list changed, we need to update the map to consider the new indices.
-    _refreshNodeIdCaches();
   }
 
   /// Deletes the node at the given [index].
@@ -727,17 +690,34 @@ class MutableDocument implements Document, Editable {
     }
   }
 
-  void deleteDuplicateDragIndicators() {
+  void updateDragIndicators() {
     if (_nodes.isEmpty) return;
     DocumentNode prevNode = _nodes[0];
-    final indexes = [];
+    final addDragIndexes = [];
     for (int i = 1; i < _nodes.length; i++) {
-      if (prevNode is DragIndicatorNode && _nodes[i] is DragIndicatorNode) {
-        indexes.add(i);
+      if (prevNode is! DragIndicatorNode && _nodes[i] is! DragIndicatorNode) {
+        addDragIndexes.add(i);
       }
       prevNode = _nodes[i];
     }
-    for (int i in indexes.reversed) {
+    for (int i in addDragIndexes.reversed) {
+      insertNodeAt(
+        i,
+        DragIndicatorNode(
+          id: Editor.createNodeId(),
+          color: (_nodes.first as DragIndicatorNode).color,
+        ),
+      );
+    }
+    final removeDragIndexes = [];
+    prevNode = _nodes[0];
+    for (int i = 1; i < _nodes.length; i++) {
+      if (prevNode is DragIndicatorNode && _nodes[i] is DragIndicatorNode) {
+        removeDragIndexes.add(i);
+      }
+      prevNode = _nodes[i];
+    }
+    for (int i in removeDragIndexes.reversed) {
       deleteNodeAt(i);
     }
   }
@@ -747,7 +727,7 @@ class MutableDocument implements Document, Editable {
     bool isRemoved = false;
     isRemoved = _nodes.remove(node);
     if (isRemoved) {
-      deleteDuplicateDragIndicators();
+      updateDragIndicators();
       _refreshNodeIdCaches();
     }
 

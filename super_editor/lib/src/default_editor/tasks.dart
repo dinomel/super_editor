@@ -616,6 +616,7 @@ class SplitExistingTaskCommand implements EditCommand {
 
     // Insert a new TextNode after the currently selected TaskNode.
     document.insertNodeAfter(existingNode: node, newNode: newTaskNode);
+    document.updateDragIndicators();
 
     // Move the caret to the beginning of the new TaskNode.
     final oldSelection = composer.selection;

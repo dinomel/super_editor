@@ -533,6 +533,7 @@ class SplitParagraphCommand implements EditCommand {
       existingNode: node,
       newNode: newNode,
     );
+    document.updateDragIndicators();
 
     editorDocLog
         .info(' - inserted new node: ${newNode.id} after old one: ${node.id}');
