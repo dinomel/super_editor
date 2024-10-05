@@ -1,10 +1,11 @@
 import 'dart:math';
 
 import 'package:flutter/foundation.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
 import 'package:super_editor/src/core/document.dart';
 import 'package:super_editor/src/core/document_layout.dart';
 import 'package:super_editor/src/core/document_selection.dart';
+import 'package:super_editor/src/default_editor/reorder_nodes.dart';
 import 'package:super_editor/src/infrastructure/_logging.dart';
 
 import '_presenter.dart';
@@ -30,6 +31,7 @@ class SingleColumnDocumentLayout extends StatefulWidget {
     required this.presenter,
     required this.componentBuilders,
     this.onBuildScheduled,
+    this.reorderNodesNotifier,
     this.showDebugPaint = false,
   }) : super(key: key);
 
@@ -57,6 +59,8 @@ class SingleColumnDocumentLayout extends StatefulWidget {
 
   /// Adds a debugging UI to the document layout, when true.
   final bool showDebugPaint;
+
+  final ReorderNodesNotifier? reorderNodesNotifier;
 
   @override
   State createState() => _SingleColumnDocumentLayoutState();
@@ -758,6 +762,8 @@ class _SingleColumnDocumentLayoutState extends State<SingleColumnDocumentLayout>
               componentBuilders: widget.componentBuilders,
               componentKey: componentKey,
               componentViewModel: newComponentViewModel,
+              findClosestDragIndexAtOffset: _findClosestDragIndexAtOffset,
+              reorderNodesNotifier: widget.reorderNodesNotifier,
             );
           },
         ),
@@ -806,6 +812,25 @@ class _SingleColumnDocumentLayoutState extends State<SingleColumnDocumentLayout>
       return -1;
     }
     return _binarySearchComponentIndexAtOffset(dy, 0, _topToBottomComponentKeys.length - 1);
+  }
+
+  int _findClosestDragIndexAtOffset(double dy) {
+    if (_topToBottomComponentKeys.isEmpty) {
+      return -1;
+    }
+    int componentIndex = _binarySearchComponentIndexAtOffset(
+      dy,
+      0,
+      _topToBottomComponentKeys.length - 1,
+    );
+    if (componentIndex < 0 || componentIndex.isEven) return componentIndex;
+    final prevBound = _getComponentBoundsByIndex(componentIndex - 1);
+    final nextBound = _getComponentBoundsByIndex(componentIndex + 1);
+    if (dy - prevBound.top > nextBound.top - dy) {
+      return componentIndex + 1;
+    } else {
+      return componentIndex - 1;
+    }
   }
 
   /// Performs a binary search starting from [minIndex] to [maxIndex] to find
@@ -944,6 +969,8 @@ class _Component extends StatelessWidget {
     required this.componentBuilders,
     required this.componentViewModel,
     required this.componentKey,
+    required this.findClosestDragIndexAtOffset,
+    required this.reorderNodesNotifier,
     // TODO(srawlins): `unused_element`, when reporting a parameter, is being
     // renamed to `unused_element_parameter`. For now, ignore each; when the SDK
     // constraint is >= 3.6.0, just ignore `unused_element_parameter`.
@@ -968,19 +995,31 @@ class _Component extends StatelessWidget {
   /// Whether to add debug paint to the component.
   final bool showDebugPaint;
 
+  final int Function(double) findClosestDragIndexAtOffset;
+
+  final ReorderNodesNotifier? reorderNodesNotifier;
+
   @override
   Widget build(BuildContext context) {
     final componentContext = SingleColumnDocumentComponentContext(
       context: context,
       componentKey: componentKey,
     );
+    final feedbackContext = SingleColumnDocumentComponentContext(
+      context: context,
+      componentKey: GlobalKey(),
+    );
     for (final componentBuilder in componentBuilders) {
-      var component = componentBuilder.createComponent(componentContext, componentViewModel);
+      var component = componentBuilder.createComponent(
+        componentContext,
+        componentViewModel,
+      );
       if (component != null) {
         // TODO: we might need a SizeChangedNotifier here for the case where two components
         //       change size exactly inversely
         component = ConstrainedBox(
-          constraints: BoxConstraints(maxWidth: componentViewModel.maxWidth ?? double.infinity),
+          constraints: BoxConstraints(
+              maxWidth: componentViewModel.maxWidth ?? double.infinity),
           child: SizedBox(
             width: double.infinity,
             child: Padding(
@@ -989,6 +1028,49 @@ class _Component extends StatelessWidget {
             ),
           ),
         );
+
+        var feedback = componentBuilder.createComponent(
+          feedbackContext,
+          componentViewModel,
+        );
+        if (reorderNodesNotifier != null) {
+          component = LongPressDraggable<String>(
+            hitTestBehavior: HitTestBehavior.translucent,
+            data: componentViewModel.nodeId,
+            onDragUpdate: (details) {
+              // print('details: ${details.globalPosition}');
+              reorderNodesNotifier!.onDragUpdate(
+                context: context,
+                details: details,
+                findComponentIndexAtOffset: findClosestDragIndexAtOffset,
+              );
+            },
+            onDragStarted: () =>
+                reorderNodesNotifier!.onDragStarted(componentViewModel.nodeId),
+            onDraggableCanceled: reorderNodesNotifier!.onDraggableCanceled,
+            // onDragCompleted: reorderNotifier.onDragCompleted,
+            onDragEnd: (_) => reorderNodesNotifier!.onDragEnd(),
+            feedback: Material(
+              color: Colors.transparent,
+              child: Opacity(
+                opacity: 0.6,
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                    maxWidth: MediaQuery.of(context).size.width,
+                  ),
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: Padding(
+                      padding: componentViewModel.padding,
+                      child: feedback,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            child: component,
+          );
+        }
 
         return showDebugPaint ? _wrapWithDebugWidget(component) : component;
       }

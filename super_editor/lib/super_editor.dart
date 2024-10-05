@@ -47,6 +47,7 @@ export 'src/default_editor/selection_upstream_downstream.dart';
 export 'src/default_editor/super_editor.dart';
 export 'src/default_editor/tasks.dart';
 export 'src/default_editor/text.dart';
+export 'src/default_editor/drag_indicator.dart';
 export 'src/default_editor/text_tools.dart';
 export 'src/default_editor/text_tokenizing/action_tags.dart';
 export 'src/default_editor/text_tokenizing/pattern_tags.dart';

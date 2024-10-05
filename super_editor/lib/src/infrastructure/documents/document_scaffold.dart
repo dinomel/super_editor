@@ -3,6 +3,7 @@ import 'package:super_editor/src/core/document_debug_paint.dart';
 import 'package:super_editor/src/default_editor/document_scrollable.dart';
 import 'package:super_editor/src/default_editor/layout_single_column/_layout.dart';
 import 'package:super_editor/src/default_editor/layout_single_column/_presenter.dart';
+import 'package:super_editor/src/default_editor/reorder_nodes.dart';
 import 'package:super_editor/src/infrastructure/content_layers.dart';
 import 'package:super_editor/src/infrastructure/documents/document_scroller.dart';
 import 'package:super_editor/src/infrastructure/flutter/build_context.dart';
@@ -26,6 +27,7 @@ class DocumentScaffold<ContextType> extends StatefulWidget {
     required this.scroller,
     required this.presenter,
     required this.componentBuilders,
+    this.reorderNodesNotifier,
     required this.shrinkWrap,
     this.underlays = const [],
     this.overlays = const [],
@@ -85,6 +87,8 @@ class DocumentScaffold<ContextType> extends StatefulWidget {
   /// Whether the document should shrink-wrap its content.
   /// Only used when the document is not inside a scrollable.
   final bool shrinkWrap;
+
+  final ReorderNodesNotifier? reorderNodesNotifier;
 
   @override
   State<DocumentScaffold> createState() => _DocumentScaffoldState();
@@ -156,6 +160,7 @@ class _DocumentScaffoldState extends State<DocumentScaffold> {
         key: widget.documentLayoutKey,
         presenter: widget.presenter,
         componentBuilders: widget.componentBuilders,
+        reorderNodesNotifier: widget.reorderNodesNotifier,
         onBuildScheduled: onBuildScheduled,
         showDebugPaint: widget.debugPaint.layout,
       ),

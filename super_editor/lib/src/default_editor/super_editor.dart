@@ -1,5 +1,6 @@
 import 'package:attributed_text/attributed_text.dart';
-import 'package:flutter/foundation.dart' show ValueListenable, defaultTargetPlatform;
+import 'package:flutter/foundation.dart'
+    show ValueListenable, defaultTargetPlatform;
 import 'package:flutter/material.dart' hide SelectableText;
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
@@ -20,6 +21,7 @@ import 'package:super_editor/src/default_editor/document_gestures_touch_ios.dart
 import 'package:super_editor/src/default_editor/document_scrollable.dart';
 import 'package:super_editor/src/default_editor/layout_single_column/_styler_composing_region.dart';
 import 'package:super_editor/src/default_editor/list_items.dart';
+import 'package:super_editor/src/default_editor/reorder_nodes.dart';
 import 'package:super_editor/src/default_editor/tasks.dart';
 import 'package:super_editor/src/infrastructure/_logging.dart';
 import 'package:super_editor/src/infrastructure/content_layers.dart';
@@ -139,6 +141,7 @@ class SuperEditor extends StatefulWidget {
     this.plugins = const {},
     this.debugPaint = const DebugPaintConfig(),
     this.shrinkWrap = false,
+    this.reorderNodesNotifier,
   })  : stylesheet = stylesheet ?? defaultStylesheet,
         selectionStyles = selectionStyle ?? defaultSelectionStyle,
         componentBuilders = componentBuilders != null
@@ -351,6 +354,8 @@ class SuperEditor extends StatefulWidget {
   /// Whether the scroll view used by the editor should shrink-wrap its contents.
   /// Only used when editor is not inside an scrollable.
   final bool shrinkWrap;
+
+  final ReorderNodesNotifier? reorderNodesNotifier;
 
   @override
   SuperEditorState createState() => SuperEditorState();
@@ -659,6 +664,7 @@ class SuperEditorState extends State<SuperEditor> {
             restorePreviousSelectionOnGainFocus: widget.selectionPolicies.restorePreviousSelectionOnGainFocus,
             clearSelectionWhenEditorLosesFocus: widget.selectionPolicies.clearSelectionWhenEditorLosesFocus,
             child: DocumentScaffold(
+              reorderNodesNotifier: widget.reorderNodesNotifier,
               documentLayoutLink: _documentLayoutLink,
               documentLayoutKey: _docLayoutKey,
               viewportDecorationBuilder: _buildPlatformSpecificViewportDecorations,

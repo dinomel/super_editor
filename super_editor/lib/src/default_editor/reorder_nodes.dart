@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:super_editor/src/default_editor/drag_indicator.dart';
 import 'package:super_editor/super_editor.dart';
 
 class ReorderNodesNotifier extends ChangeNotifier {
@@ -10,6 +11,7 @@ class ReorderNodesNotifier extends ChangeNotifier {
   final Editor docEditor;
   int? dragIndex;
   String? dragNodeID;
+  String? nodeID;
   double? dragPositionDeltaY;
   Timer? dragAutoscrollTimer;
   double? screenHeight;
@@ -19,11 +21,10 @@ class ReorderNodesNotifier extends ChangeNotifier {
   bool isDragNodeVisible(String nodeId) => dragNodeID == nodeId;
 
   ReorderNodesNotifier({
-    required this.doc,
     required this.docEditor,
     required this.scrollController,
     this.topPadding = 0,
-  });
+  }) : doc = docEditor.document;
 
   @override
   void dispose() {
@@ -31,11 +32,22 @@ class ReorderNodesNotifier extends ChangeNotifier {
     super.dispose();
   }
 
+  void onDragStarted(String nodeID) {
+    this.nodeID = nodeID;
+    log('onDragStarted triggered');
+    final requests = List<EditRequest>.generate(doc.nodeCount + 1, (index) {
+      return InsertNodeAtIndexRequest(
+        nodeIndex: index,
+        newNode: DragIndicatorNode(),
+      );
+    }).reversed.toList();
+    docEditor.execute(requests);
+  }
+
   void onDragUpdate({
     required BuildContext context,
     required DragUpdateDetails details,
     required int Function(double) findComponentIndexAtOffset,
-    required String nodeId,
   }) {
     final mediaQuery = MediaQuery.of(Scaffold.of(context).context);
     screenHeight = MediaQuery.of(context).size.height -
@@ -43,48 +55,36 @@ class ReorderNodesNotifier extends ChangeNotifier {
         topPadding;
     _setAutoscrollTimer();
     dragPositionDeltaY = details.globalPosition.dy - topPadding;
-    final nodeIndex = doc.getNodeIndexById(nodeId);
     final newIndex = findComponentIndexAtOffset(
       details.globalPosition.dy - topPadding + scrollController.offset,
     );
     if (dragIndex == newIndex) return;
-    // if (dragIndex == newIndex || dragIndex == newIndex - 1) return;
-
-    if (newIndex == nodeIndex + 1 || newIndex == nodeIndex - 1) {
-      dragIndex = null;
-      dragNodeID = null;
-    } else {
-      dragIndex = newIndex;
-      dragNodeID = doc.getNodeAt(newIndex)?.id;
-    }
+    dragIndex = newIndex;
+    dragNodeID = doc.getNodeAt(newIndex)?.id;
+    log('dragIndex: $dragIndex');
     notifyListeners();
   }
 
-  void onDragEnd(String nodeId) {
-    if (dragIndex == null || dragIndex! < 0 || dragIndex! >= doc.nodeCount) {
-      return;
-    }
-    final dragNodeIndex = doc.getNodeIndexById(nodeId) - 1;
-    final dragNode = doc.getNodeAt(dragNodeIndex);
-    if (dragNode == null) {
-      log('dragNode is null!');
+  void onDragEnd() {
+    log('onDragEnd triggered');
+    final requests = doc
+        .whereType<DragIndicatorNode>()
+        .map((e) => DeleteNodeRequest(nodeId: e.id))
+        .toList();
+    if (nodeID == null ||
+        dragIndex == null ||
+        dragIndex! < 0 ||
+        dragIndex! >= doc.nodeCount) {
+      docEditor.execute(requests);
       return;
     }
     docEditor.execute([
-      MoveNodeRequest(nodeId: nodeId, newIndex: dragIndex!),
+      MoveNodeRequest(nodeId: nodeID!, newIndex: dragIndex!),
     ]);
+    docEditor.execute(requests);
     dragIndex = null;
     dragNodeID = null;
-    dragPositionDeltaY = null;
-    dragAutoscrollTimer?.cancel();
-    dragAutoscrollTimer = null;
-    screenHeight = null;
-    notifyListeners();
-  }
-
-  void onDragCompleted() {
-    dragIndex = null;
-    dragNodeID = null;
+    nodeID = null;
     dragPositionDeltaY = null;
     dragAutoscrollTimer?.cancel();
     dragAutoscrollTimer = null;
@@ -93,8 +93,16 @@ class ReorderNodesNotifier extends ChangeNotifier {
   }
 
   void onDraggableCanceled(Velocity velocity, Offset offset) {
+    if (nodeID == null) return;
+    log('onDraggableCanceled triggered');
+    final requests = doc
+        .whereType<DragIndicatorNode>()
+        .map((e) => DeleteNodeRequest(nodeId: e.id))
+        .toList();
+    docEditor.execute(requests);
     dragIndex = null;
     dragNodeID = null;
+    nodeID = null;
     dragPositionDeltaY = null;
     dragAutoscrollTimer?.cancel();
     dragAutoscrollTimer = null;
