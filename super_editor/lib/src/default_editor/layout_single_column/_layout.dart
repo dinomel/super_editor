@@ -1048,26 +1048,26 @@ class _Component extends StatelessWidget {
             onDragStarted: () =>
                 reorderNodesNotifier!.onDragStarted(componentViewModel.nodeId),
             onDraggableCanceled: reorderNodesNotifier!.onDraggableCanceled,
-            // onDragCompleted: reorderNotifier.onDragCompleted,
             onDragEnd: (_) => reorderNodesNotifier!.onDragEnd(),
-            feedback: Material(
-              color: Colors.transparent,
-              child: Opacity(
-                opacity: 0.6,
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(
-                    maxWidth: MediaQuery.of(context).size.width,
-                  ),
-                  child: SizedBox(
-                    width: double.infinity,
-                    child: Padding(
-                      padding: componentViewModel.padding,
-                      child: feedback,
-                    ),
-                  ),
-                ),
-              ),
-            ),
+            feedback: const Placeholder(),
+            // feedback: Material(
+            //   color: Colors.transparent,
+            //   child: Opacity(
+            //     opacity: 0.6,
+            //     child: ConstrainedBox(
+            //       constraints: BoxConstraints(
+            //         maxWidth: MediaQuery.of(context).size.width,
+            //       ),
+            //       child: SizedBox(
+            //         width: double.infinity,
+            //         child: Padding(
+            //           padding: componentViewModel.padding,
+            //           child: feedback,
+            //         ),
+            //       ),
+            //     ),
+            //   ),
+            // ),
             child: component,
           );
         }
