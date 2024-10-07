@@ -1028,17 +1028,15 @@ class _Component extends StatelessWidget {
             ),
           ),
         );
-
-        var feedback = componentBuilder.createComponent(
-          feedbackContext,
-          componentViewModel,
-        );
         if (reorderNodesNotifier != null) {
-          component = LongPressDraggable<String>(
+
+          var feedback = componentBuilder.createComponent(
+            feedbackContext,
+            componentViewModel,
+          );
+          component = LongPressDraggable(
             hitTestBehavior: HitTestBehavior.translucent,
-            data: componentViewModel.nodeId,
             onDragUpdate: (details) {
-              // print('details: ${details.globalPosition}');
               reorderNodesNotifier!.onDragUpdate(
                 context: context,
                 details: details,
@@ -1049,25 +1047,25 @@ class _Component extends StatelessWidget {
                 reorderNodesNotifier!.onDragStarted(componentViewModel.nodeId),
             onDraggableCanceled: reorderNodesNotifier!.onDraggableCanceled,
             onDragEnd: (_) => reorderNodesNotifier!.onDragEnd(),
-            feedback: const Placeholder(),
-            // feedback: Material(
-            //   color: Colors.transparent,
-            //   child: Opacity(
-            //     opacity: 0.6,
-            //     child: ConstrainedBox(
-            //       constraints: BoxConstraints(
-            //         maxWidth: MediaQuery.of(context).size.width,
-            //       ),
-            //       child: SizedBox(
-            //         width: double.infinity,
-            //         child: Padding(
-            //           padding: componentViewModel.padding,
-            //           child: feedback,
-            //         ),
-            //       ),
-            //     ),
-            //   ),
-            // ),
+            // feedback: const Placeholder(),
+            feedback: Material(
+              color: Colors.transparent,
+              child: Opacity(
+                opacity: 0.6,
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                    maxWidth: MediaQuery.of(context).size.width,
+                  ),
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: Padding(
+                      padding: componentViewModel.padding,
+                      child: feedback,
+                    ),
+                  ),
+                ),
+              ),
+            ),
             child: component,
           );
         }

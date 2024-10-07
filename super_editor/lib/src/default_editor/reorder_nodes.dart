@@ -1,8 +1,6 @@
 import 'dart:async';
-import 'dart:developer';
 
 import 'package:flutter/material.dart';
-import 'package:super_editor/src/default_editor/drag_indicator.dart';
 import 'package:super_editor/super_editor.dart';
 
 class ReorderNodesNotifier extends ChangeNotifier {
@@ -34,7 +32,6 @@ class ReorderNodesNotifier extends ChangeNotifier {
 
   void onDragStarted(String nodeID) {
     this.nodeID = nodeID;
-    log('onDragStarted triggered');
     final requests = List<EditRequest>.generate(doc.nodeCount + 1, (index) {
       return InsertNodeAtIndexRequest(
         nodeIndex: index,
@@ -58,15 +55,19 @@ class ReorderNodesNotifier extends ChangeNotifier {
     final newIndex = findComponentIndexAtOffset(
       details.globalPosition.dy - topPadding + scrollController.offset,
     );
-    if (dragIndex == newIndex) return;
-    dragIndex = newIndex;
-    dragNodeID = doc.getNodeAt(newIndex)?.id;
-    log('dragIndex: $dragIndex');
+    if (dragIndex == newIndex || nodeID == null) return;
+    final nodeIndex = doc.getNodeIndexById(nodeID!);
+    if (newIndex == nodeIndex + 1 || newIndex == nodeIndex - 1) {
+      dragIndex = null;
+      dragNodeID = null;
+    } else {
+      dragIndex = newIndex;
+      dragNodeID = doc.getNodeAt(newIndex)?.id;
+    }
     notifyListeners();
   }
 
   void onDragEnd() {
-    log('onDragEnd triggered');
     final requests = doc
         .whereType<DragIndicatorNode>()
         .map((e) => DeleteNodeRequest(nodeId: e.id))
@@ -94,7 +95,6 @@ class ReorderNodesNotifier extends ChangeNotifier {
 
   void onDraggableCanceled(Velocity velocity, Offset offset) {
     if (nodeID == null) return;
-    log('onDraggableCanceled triggered');
     final requests = doc
         .whereType<DragIndicatorNode>()
         .map((e) => DeleteNodeRequest(nodeId: e.id))
