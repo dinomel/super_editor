@@ -1,5 +1,6 @@
 import 'package:attributed_text/attributed_text.dart';
 import 'package:flutter/painting.dart';
+import 'package:super_editor/src/default_editor/drag_indicator.dart';
 
 import 'document.dart';
 
@@ -175,7 +176,10 @@ class BlockSelector {
     }
 
     if (_precedingBlockType != null) {
-      final nodeBefore = document.getNodeBefore(node);
+      DocumentNode? nodeBefore = document.getNodeBefore(node);
+      if (nodeBefore is DragIndicatorNode) {
+        nodeBefore = document.getNodeBefore(nodeBefore);
+      }
       if (nodeBefore == null ||
           (nodeBefore.getMetadataValue("blockType") as NamedAttribution?)?.name != _precedingBlockType) {
         return false;
@@ -183,7 +187,10 @@ class BlockSelector {
     }
 
     if (_followingBlockType != null) {
-      final nodeAfter = document.getNodeAfter(node);
+      DocumentNode? nodeAfter = document.getNodeAfter(node);
+      if (nodeAfter is DragIndicatorNode) {
+        nodeAfter = document.getNodeAfter(nodeAfter);
+      }
       if (nodeAfter == null ||
           (nodeAfter.getMetadataValue("blockType") as NamedAttribution?)?.name != _followingBlockType) {
         return false;

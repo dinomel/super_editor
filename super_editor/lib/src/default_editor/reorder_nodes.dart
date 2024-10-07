@@ -15,6 +15,7 @@ class ReorderNodesNotifier extends ChangeNotifier {
   double? screenHeight;
   final double topPadding;
   final autoscrollCoefficient = 8;
+  bool _canUpdateDragNode = false;
 
   bool isDragNodeVisible(String nodeId) => dragNodeID == nodeId;
 
@@ -39,6 +40,11 @@ class ReorderNodesNotifier extends ChangeNotifier {
       );
     }).reversed.toList();
     docEditor.execute(requests);
+
+    // docEditor.execute(requests) can not be awaited so an artificial delay is needed
+    Future.delayed(const Duration(milliseconds: 100), () {
+      _canUpdateDragNode = true;
+    });
   }
 
   void onDragUpdate({
@@ -46,6 +52,7 @@ class ReorderNodesNotifier extends ChangeNotifier {
     required DragUpdateDetails details,
     required int Function(double) findComponentIndexAtOffset,
   }) {
+    if (!_canUpdateDragNode) return;
     final mediaQuery = MediaQuery.of(Scaffold.of(context).context);
     screenHeight = MediaQuery.of(context).size.height -
         mediaQuery.viewInsets.bottom -
@@ -85,6 +92,7 @@ class ReorderNodesNotifier extends ChangeNotifier {
     docEditor.execute(requests);
     dragIndex = null;
     dragNodeID = null;
+    _canUpdateDragNode = false;
     nodeID = null;
     dragPositionDeltaY = null;
     dragAutoscrollTimer?.cancel();
@@ -102,6 +110,7 @@ class ReorderNodesNotifier extends ChangeNotifier {
     docEditor.execute(requests);
     dragIndex = null;
     dragNodeID = null;
+    _canUpdateDragNode = false;
     nodeID = null;
     dragPositionDeltaY = null;
     dragAutoscrollTimer?.cancel();
